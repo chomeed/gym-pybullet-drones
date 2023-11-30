@@ -1,3 +1,8 @@
+# Custom 
+runs/
+models/
+wandb/
+
 # TODOs 
 TODOs.md
 examples/debug.py
