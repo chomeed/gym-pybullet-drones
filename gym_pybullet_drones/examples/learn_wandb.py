@@ -86,13 +86,13 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
-    model.learn(total_timesteps=1*int(1e4) if local else int(1e4), # shorter training in GitHub Actions pytest
+    model.learn(total_timesteps=3*int(1e5) if local else int(1e4), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
                     gradient_save_freq=100,
                     model_save_path=output_folder + f"/models/{wb_run.id}",
                     verbose=2
                 ),
-                log_interval=10)
+                log_interval=50)
 
     #### Save the model ########################################
     model.save(output_folder+'/models/success_model.pkl')
@@ -111,11 +111,10 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     if os.path.isfile(output_folder+'/models/success_model.pkl'):
         path = output_folder+'/models/success_model.pkl'
         model = SAC.load(path)
-        print('된다요!!!!!!!!!!!!!!!!')
+        print(path, " loaded successfully.")
     elif os.path.isfile(filename+'/best_model.pkl'):
         path = filename+'/best_model.pkl'
         model = SAC.load(path)
-
     else:
         print("[ERROR]: no model under the specified path", filename)
     

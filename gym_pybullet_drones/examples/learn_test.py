@@ -35,7 +35,7 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
 DEFAULT_GUI = True
 DEFAULT_RECORD_VIDEO = False
-DEFAULT_OUTPUT_FOLDER = 'models/hover2'
+DEFAULT_OUTPUT_FOLDER = 'models/hover'
 # DEFAULT_OUTPUT_FOLDER = 'models/1rjx8qgt'
 DEFAULT_COLAB = False
 
@@ -80,9 +80,9 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 # tensorboard_log=filename+'/tb/',
                 verbose=1)
 
-    if os.path.isfile(filename+'/success_model-2.zip'):
+    if os.path.isfile(filename+'/success_model.pkl'):
         print("시작해보자222")
-        path = filename+'/success_model-2.zip'
+        path = filename+'/success_model.pkl'
         print(path)
         model2 = SAC.load(path)
         print('sfklsdjflksdjflsdfj')
