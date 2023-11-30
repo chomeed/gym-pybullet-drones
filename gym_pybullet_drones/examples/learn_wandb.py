@@ -95,7 +95,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 log_interval=10)
 
     #### Save the model ########################################
-    model.save(output_folder+'/models/success_model.zip')
+    model.save(output_folder+'/models/success_model.pkl')
 
     #### Print training progression ############################
     # with np.load(filename+'/evaluations.npz') as data:
@@ -108,12 +108,12 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     ############################################################
     ############################################################
 
-    if os.path.isfile(filename+'models/success_model.zip'):
-        path = filename+'models/success_model.zip'
+    if os.path.isfile(output_folder+'/models/success_model.pkl'):
+        path = output_folder+'/models/success_model.pkl'
         model = SAC.load(path)
-
-    elif os.path.isfile(filename+'/best_model.zip'):
-        path = filename+'/best_model.zip'
+        print('된다요!!!!!!!!!!!!!!!!')
+    elif os.path.isfile(filename+'/best_model.pkl'):
+        path = filename+'/best_model.pkl'
         model = SAC.load(path)
 
     else:

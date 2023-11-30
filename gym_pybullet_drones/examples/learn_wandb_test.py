@@ -15,6 +15,12 @@ This is a minimal working example integrating `gym-pybullet-drones` with
 reinforcement learning library `stable-baselines3`.
 
 """
+import wandb
+from wandb.integration.sb3 import WandbCallback
+from stable_baselines3.common.monitor import Monitor
+
+
+
 import os
 import time
 from datetime import datetime
@@ -35,8 +41,7 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
 DEFAULT_GUI = True
 DEFAULT_RECORD_VIDEO = False
-DEFAULT_OUTPUT_FOLDER = 'models/hover2'
-# DEFAULT_OUTPUT_FOLDER = 'models/1rjx8qgt'
+DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = False
 
 DEFAULT_OBS = ObservationType('kin') # 'kin' or 'rgb'
@@ -44,10 +49,11 @@ DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one
 DEFAULT_AGENTS = 2
 DEFAULT_MA = False
 
-def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True):
+def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True, **kwargs):
 
-    filename = output_folder
-    # filename = os.path.join(output_folder, 'save-'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"))
+    filename = os.path.join(output_folder, 'save-'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"))
+    if not os.path.exists(filename):
+        os.makedirs(filename+'/')
 
     if not multiagent:
         train_env = make_vec_env(HoverAviary,
@@ -68,34 +74,45 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     print('[INFO] Action space:', train_env.action_space)
     print('[INFO] Observation space:', train_env.observation_space)
 
-    #### Print training progression ############################
-    # with np.load(filename+'/evaluations.npz') as data:
-    #     for j in range(data['timesteps'].shape[0]):
-    #         print(str(data['timesteps'][j])+","+str(data['results'][j][0]))
-
     #### Train the model #######################################
     model = SAC('MlpPolicy',
                 train_env,
                 # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
                 # tensorboard_log=filename+'/tb/',
+                tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
-    if os.path.isfile(filename+'/success_model-2.zip'):
-        print("시작해보자222")
-        path = filename+'/success_model-2.zip'
-        print(path)
-        model2 = SAC.load(path)
-        print('sfklsdjflksdjflsdfj')
-        model = SAC.load(path, print_system_info=True, device='cuda', map_location='cpu')
-        print("끝")
-    elif os.path.isfile(filename+'/model.zip'):
-        print("시작해보자")
-        path = filename+'/model.zip'
-        # model.load(path, map_location='cpu')
-        model = SAC.load(path, map_location='cpu', print_system_info=True)
-        print("끝")
+    model.learn(total_timesteps=1*int(1e4) if local else int(1e4), # shorter training in GitHub Actions pytest
+                callback=WandbCallback(
+                    gradient_save_freq=100,
+                    model_save_path=output_folder + f"/models/{wb_run.id}",
+                    verbose=2
+                ),
+                log_interval=10)
 
-    else:   
+    #### Save the model ########################################
+    model.save(output_folder+'/models/success_model.zip')
+
+    #### Print training progression ############################
+    # with np.load(filename+'/evaluations.npz') as data:
+    #     for j in range(data['timesteps'].shape[0]):
+    #         print(str(data['timesteps'][j])+","+str(data['results'][j][0]))
+
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+    ############################################################
+
+    if os.path.isfile(filename+'models/success_model.zip'):
+        path = filename+'models/success_model.zip'
+        model = SAC.load(path)
+
+    elif os.path.isfile(filename+'/best_model.zip'):
+        path = filename+'/best_model.zip'
+        model = SAC.load(path)
+
+    else:
         print("[ERROR]: no model under the specified path", filename)
     
     #### Show (and record a video of) the model's performance ##
@@ -160,8 +177,8 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
         print(terminated)
         sync(i, start, test_env.CTRL_TIMESTEP)
         if terminated:
-            test_env.close()
-            # obs = test_env.reset(seed=42, options={})
+            obs = test_env.reset(seed=42, options={})
+            break
     test_env.close()
 
     if plot and DEFAULT_OBS == ObservationType.KIN:
@@ -175,6 +192,10 @@ if __name__ == '__main__':
     parser.add_argument('--record_video',       default=DEFAULT_RECORD_VIDEO,  type=str2bool,      help='Whether to record a video (default: False)', metavar='')
     parser.add_argument('--output_folder',      default=DEFAULT_OUTPUT_FOLDER, type=str,           help='Folder where to save logs (default: "results")', metavar='')
     parser.add_argument('--colab',              default=DEFAULT_COLAB,         type=bool,          help='Whether example is being run by a notebook (default: "False")', metavar='')
+    parser.add_argument('--wandb_key')
+    
     ARGS = parser.parse_args()
+
+
 
     run(**vars(ARGS))
