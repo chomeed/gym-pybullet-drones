@@ -126,7 +126,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
 
     obs, info = test_env.reset(seed=42, options={})
     start = time.time()
-    for i in range((test_env.EPISODE_LEN_SEC+2)*test_env.CTRL_FREQ):
+    for i in range((test_env.EPISODE_LEN_SEC+50)*test_env.CTRL_FREQ):
         action, _states = model.predict(obs,
                                         deterministic=True
                                         )
@@ -160,8 +160,9 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
         print(terminated)
         sync(i, start, test_env.CTRL_TIMESTEP)
         if terminated:
-            test_env.close()
-            # obs = test_env.reset(seed=42, options={})
+            # break
+            # test_env.close()
+            obs, info = test_env.reset(seed=42, options={})
     test_env.close()
 
     if plot and DEFAULT_OBS == ObservationType.KIN:

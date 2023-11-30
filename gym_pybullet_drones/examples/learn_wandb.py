@@ -86,7 +86,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
-    model.learn(total_timesteps=3*int(1e5) if local else int(1e4), # shorter training in GitHub Actions pytest
+    model.learn(total_timesteps=5*int(1e5) if local else int(1e4), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
                     gradient_save_freq=100,
                     model_save_path=output_folder + f"/models/{wb_run.id}",
