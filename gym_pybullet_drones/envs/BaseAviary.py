@@ -527,16 +527,17 @@ class BaseAviary(gym.Env):
 
         """
         if self.RECORD and self.GUI:
-            VIDEO_FOLDER = os.path.join(self.OUTPUT_FOLDER, "recording_" + datetime.now().strftime("%m.%d.%Y_%H.%M.%S"))
+            VIDEO_FOLDER = os.path.join(self.OUTPUT_FOLDER, "recording_" + datetime.now().strftime("%m.%d.%Y_%H.%M.%S") + '/')
             os.makedirs(os.path.dirname(VIDEO_FOLDER), exist_ok=True)
+            print("VIDEO FOLDER CREATED:", VIDEO_FOLDER)
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
                                                 fileName=os.path.join(VIDEO_FOLDER, "output.mp4"),
                                                 physicsClientId=self.CLIENT
                                                 )
-        if self.RECORD and not self.GUI:
-            self.FRAME_NUM = 0
-            self.IMG_PATH = os.path.join(self.OUTPUT_FOLDER, "recording_" + datetime.now().strftime("%m.%d.%Y_%H.%M.%S"), '')
-            os.makedirs(os.path.dirname(self.IMG_PATH), exist_ok=True)
+        # if self.RECORD and not self.GUI:
+        #     self.FRAME_NUM = 0
+        #     self.IMG_PATH = os.path.join(self.OUTPUT_FOLDER, "recording_" + datetime.now().strftime("%m.%d.%Y_%H.%M.%S"), '')
+        #     os.makedirs(os.path.dirname(self.IMG_PATH), exist_ok=True)
     
     ################################################################################
 

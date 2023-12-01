@@ -35,7 +35,7 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
 DEFAULT_GUI = True
 DEFAULT_RECORD_VIDEO = False
-DEFAULT_OUTPUT_FOLDER = 'models/hover'
+DEFAULT_OUTPUT_FOLDER = 'models/hover_best'
 # DEFAULT_OUTPUT_FOLDER = 'models/1rjx8qgt'
 DEFAULT_COLAB = False
 
@@ -162,7 +162,10 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
         if terminated:
             # break
             # test_env.close()
-            obs, info = test_env.reset(seed=42, options={})
+            import random 
+            rand_seed = random.randint(1, 9999)
+            obs, info = test_env.reset(seed=rand_seed, options={})
+            print("NEW TRIAL!!! ", rand_seed)
     test_env.close()
 
     if plot and DEFAULT_OBS == ObservationType.KIN:

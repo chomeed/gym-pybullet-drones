@@ -40,7 +40,7 @@ from gym_pybullet_drones.utils.utils import sync, str2bool
 from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
 DEFAULT_GUI = True
-DEFAULT_RECORD_VIDEO = False
+DEFAULT_RECORD_VIDEO = True
 DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = False
 
@@ -86,13 +86,13 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
-    model.learn(total_timesteps=5*int(1e5) if local else int(1e4), # shorter training in GitHub Actions pytest
+    model.learn(total_timesteps=8*int(1e5) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
                     gradient_save_freq=100,
                     model_save_path=output_folder + f"/models/{wb_run.id}",
                     verbose=2
                 ),
-                log_interval=50)
+                log_interval=5)
 
     #### Save the model ########################################
     model.save(output_folder+'/models/success_model.pkl')
@@ -120,6 +120,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     
     #### Show (and record a video of) the model's performance ##
     if not multiagent:
+        print("TEST ENV RECORD VIDEO:", record_video)
         test_env = HoverAviary(gui=gui,
                                obs=DEFAULT_OBS,
                                act=DEFAULT_ACT,
@@ -180,8 +181,9 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
         print(terminated)
         sync(i, start, test_env.CTRL_TIMESTEP)
         if terminated:
-            obs = test_env.reset(seed=42, options={})
             break
+            obs, info = test_env.reset(seed=42, options={})
+            # break
     test_env.close()
 
     if plot and DEFAULT_OBS == ObservationType.KIN:
@@ -196,7 +198,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_folder',      default=DEFAULT_OUTPUT_FOLDER, type=str,           help='Folder where to save logs (default: "results")', metavar='')
     parser.add_argument('--colab',              default=DEFAULT_COLAB,         type=bool,          help='Whether example is being run by a notebook (default: "False")', metavar='')
     parser.add_argument('--wandb_key')
-    
+    parser.add_argument('--steps')
     ARGS = parser.parse_args()
 
     config = {
