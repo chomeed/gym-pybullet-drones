@@ -65,7 +65,8 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     if os.path.isfile(output_folder+'/success_model.pkl'):
         print("시작해보자222")
         path = output_folder+'/success_model.pkl'
-        model = SAC.load(path, print_system_info=True)
+        # model = SAC.load(path, print_system_info=True)
+        model = model.load(path)
         print("끝")
     elif os.path.isfile(output_folder+'/model.zip'):
         path = output_folder+'/model.zip'

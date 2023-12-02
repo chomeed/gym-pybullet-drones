@@ -84,6 +84,8 @@ def run(steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
+    model.load('/model/R018_discrete.pkl')
+
     model.learn(total_timesteps=int(steps) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
                     gradient_save_freq=100,
