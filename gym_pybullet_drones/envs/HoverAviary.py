@@ -76,7 +76,13 @@ class HoverAviary(BaseRLAviary):
         """
         state = self._getDroneStateVector(0)
         #ret = -np.linalg.norm(self.TARGET_POS-state[0:3])**4
-        ret = max(0, 1 - np.linalg.norm(self.TARGET_POS-state[0:3])) # state[0:3] -> 드론의 현재 (x, y, z) 좌표 
+        # ret = max(0, 1 - np.linalg.norm(self.TARGET_POS-state[0:3])) # state[0:3] -> 드론의 현재 (x, y, z) 좌표 
+
+        if np.linalg.norm(self.TARGET_POS-state[0:3]) < 0.18:
+            ret = 1
+        else:
+            ret = -1
+
         return ret
 
     ################################################################################
