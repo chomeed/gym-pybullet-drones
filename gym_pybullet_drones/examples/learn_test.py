@@ -36,7 +36,6 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 DEFAULT_GUI = True
 DEFAULT_RECORD_VIDEO = False
 DEFAULT_OUTPUT_FOLDER = 'results/models'
-# DEFAULT_OUTPUT_FOLDER = 'models/1rjx8qgt'
 DEFAULT_COLAB = False
 
 DEFAULT_OBS = ObservationType('kin') # 'kin' or 'rgb'
@@ -46,72 +45,44 @@ DEFAULT_MA = False
 
 def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True):
 
-    filename = output_folder
-    # filename = os.path.join(output_folder, 'save-'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"))
-
-    if not multiagent:
-        train_env = make_vec_env(HoverAviary,
-                                 env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=3,
-                                 seed=0
-                                 )
-        eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
-    else:
-        train_env = make_vec_env(MultiHoverAviary,
-                                 env_kwargs=dict(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=1,
-                                 seed=0
-                                 )
-        eval_env = MultiHoverAviary(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT)
+  
+    train_env = make_vec_env(HoverAviary,
+                                env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
+                                n_envs=3,
+                                seed=0
+                                )
+    eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
 
     #### Check the environment's spaces ########################
     print('[INFO] Action space:', train_env.action_space)
     print('[INFO] Observation space:', train_env.observation_space)
 
-    #### Print training progression ############################
-    # with np.load(filename+'/evaluations.npz') as data:
-    #     for j in range(data['timesteps'].shape[0]):
-    #         print(str(data['timesteps'][j])+","+str(data['results'][j][0]))
-
     #### Train the model #######################################
     model = SAC('MlpPolicy',
                 train_env,
-                # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
-                # tensorboard_log=filename+'/tb/',
                 verbose=1)
 
-    if os.path.isfile(filename+'/success_model.pkl'):
+    if os.path.isfile(output_folder+'/success_model.pkl'):
         print("시작해보자222")
-        path = filename+'/success_model.pkl'
-        print(path)
-        model2 = SAC.load(path)
-        print('sfklsdjflksdjflsdfj')
-        model = SAC.load(path, print_system_info=True, device='cuda', map_location='cpu')
+        path = output_folder+'/success_model.pkl'
+        model = SAC.load(path, print_system_info=True)
         print("끝")
-    elif os.path.isfile(filename+'/model.zip'):
-        print("시작해보자")
-        path = filename+'/model.zip'
-        # model.load(path, map_location='cpu')
-        model = SAC.load(path, map_location='cpu', print_system_info=True)
-        print("끝")
+    elif os.path.isfile(output_folder+'/model.zip'):
+        path = output_folder+'/model.zip'
+        model = SAC.load(path, print_system_info=True)
 
     else:   
         print("[ERROR]: no model under the specified path", filename)
     
     #### Show (and record a video of) the model's performance ##
-    if not multiagent:
-        test_env = HoverAviary(gui=gui,
-                               obs=DEFAULT_OBS,
-                               act=DEFAULT_ACT,
-                               record=record_video)
-        test_env_nogui = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
-    else:
-        test_env = MultiHoverAviary(gui=gui,
-                                        num_drones=DEFAULT_AGENTS,
-                                        obs=DEFAULT_OBS,
-                                        act=DEFAULT_ACT,
-                                        record=record_video)
-        test_env_nogui = MultiHoverAviary(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT)
+
+    test_env = HoverAviary(gui=gui,
+                            obs=DEFAULT_OBS,
+                            act=DEFAULT_ACT,
+                            record=record_video)
+    test_env_nogui = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
+
+
     logger = Logger(logging_freq_hz=int(test_env.CTRL_FREQ),
                 num_drones=DEFAULT_AGENTS if multiagent else 1,
                 output_folder=output_folder,
@@ -159,13 +130,8 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
         test_env.render()
         print(terminated)
         sync(i, start, test_env.CTRL_TIMESTEP)
-        if terminated:
-            # break
-            # test_env.close()
-            import random 
-            rand_seed = random.randint(1, 9999)
-            obs, info = test_env.reset(seed=rand_seed, options={})
-            print("NEW TRIAL!!! ", rand_seed)
+        if terminated or truncated:
+            obs, info = test_env.reset(seed=22, options={})
     test_env.close()
 
     if plot and DEFAULT_OBS == ObservationType.KIN:
