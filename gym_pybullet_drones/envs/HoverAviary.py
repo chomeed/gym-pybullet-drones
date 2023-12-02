@@ -93,7 +93,11 @@ class HoverAviary(BaseRLAviary):
         import math
         state = self._getDroneStateVector(0)
         roll, pitch = state[7:9]
+        z = state[2]
+
         if roll > math.pi/2 or roll < -math.pi/2 or pitch > math.pi/2 or pitch < -math.pi/2:
+            return True 
+        elif z < 0.2: 
             return True 
         else:
             return False    
