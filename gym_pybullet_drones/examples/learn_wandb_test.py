@@ -58,7 +58,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     if not multiagent:
         train_env = make_vec_env(HoverAviary,
                                  env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=1,
+                                 n_envs=5,
                                  seed=0
                                  )
         eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
@@ -79,16 +79,8 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 train_env,
                 # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
                 # tensorboard_log=filename+'/tb/',
-                tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
-    model.learn(total_timesteps=1*int(1e4) if local else int(1e4), # shorter training in GitHub Actions pytest
-                callback=WandbCallback(
-                    gradient_save_freq=100,
-                    model_save_path=output_folder + f"/models/{wb_run.id}",
-                    verbose=2
-                ),
-                log_interval=10)
 
     #### Save the model ########################################
     model.save(output_folder+'/models/success_model.zip')

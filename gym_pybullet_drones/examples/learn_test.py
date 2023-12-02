@@ -35,7 +35,7 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
 DEFAULT_GUI = True
 DEFAULT_RECORD_VIDEO = False
-DEFAULT_OUTPUT_FOLDER = 'models/hover_best'
+DEFAULT_OUTPUT_FOLDER = 'results/models'
 # DEFAULT_OUTPUT_FOLDER = 'models/1rjx8qgt'
 DEFAULT_COLAB = False
 
@@ -52,7 +52,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     if not multiagent:
         train_env = make_vec_env(HoverAviary,
                                  env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=1,
+                                 n_envs=3,
                                  seed=0
                                  )
         eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
@@ -124,7 +124,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                                               )
     print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
 
-    obs, info = test_env.reset(seed=42, options={})
+    obs, info = test_env.reset(seed=22, options={})
     start = time.time()
     for i in range((test_env.EPISODE_LEN_SEC+50)*test_env.CTRL_FREQ):
         action, _states = model.predict(obs,

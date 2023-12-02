@@ -483,6 +483,27 @@ class BaseAviary(gym.Env):
         #### Load ground plane, drone and obstacles models #########
         self.PLANE_ID = p.loadURDF("plane.urdf", physicsClientId=self.CLIENT)
 
+        ##
+
+        import random
+        import math
+
+        def generate_random_rpy(max_roll_pitch=10):
+                roll = random.uniform(-max_roll_pitch, max_roll_pitch)
+                pitch = random.uniform(-max_roll_pitch, max_roll_pitch)
+                yaw = random.uniform(-math.pi, math.pi)
+
+                # Convert angles to radians
+                roll_rad = math.radians(roll)
+                pitch_rad = math.radians(pitch)
+                yaw_rad = math.radians(yaw)
+
+                return np.array([[roll_rad, pitch_rad, yaw_rad] * self.NUM_DRONES])
+
+        self.INIT_RPYS = generate_random_rpy()
+
+        ##
+
         self.DRONE_IDS = np.array([p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+self.URDF),
                                               self.INIT_XYZS[i,:],
                                               p.getQuaternionFromEuler(self.INIT_RPYS[i,:]),

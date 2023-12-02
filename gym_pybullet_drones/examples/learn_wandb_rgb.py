@@ -18,6 +18,7 @@ reinforcement learning library `stable-baselines3`.
 import wandb
 from wandb.integration.sb3 import WandbCallback
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.preprocessing import get_obs_shape
 
 
 
@@ -44,7 +45,7 @@ DEFAULT_RECORD_VIDEO = False
 DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = False
 
-DEFAULT_OBS = ObservationType('kin') # 'kin' or 'rgb'
+DEFAULT_OBS = ObservationType('rgb') # 'kin' or 'rgb'
 DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one_d_pid'
 DEFAULT_AGENTS = 2
 DEFAULT_MA = False
@@ -67,28 +68,32 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                                  )
         eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
     else:
-        print("Single Agent Only")
-        return
+        train_env = make_vec_env(MultiHoverAviary,
+                                 env_kwargs=dict(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT),
+                                 n_envs=1,
+                                 seed=0
+                                 )
+        eval_env = MultiHoverAviary(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT)
 
     #### Check the environment's spaces ########################
     print('[INFO] Action space:', train_env.action_space)
-    print('[INFO] Observation space:', train_env.observation_space)
-
+    print('[INFO] Observation space:', type(train_env.observation_space), train_env.observation_space)
+    print('jsdfsdfsdlfdfldfldfl', get_obs_shape(train_env.observation_space))
     #### Train the model #######################################
-    model = SAC('MlpPolicy',
+    model = SAC('CnnPolicy',
                 train_env,
                 # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
                 # tensorboard_log=filename+'/tb/',
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
-    model.learn(total_timesteps=1*int(1e6) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
+    model.learn(total_timesteps=8*int(1e5) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
                     gradient_save_freq=100,
                     model_save_path=output_folder + f"/models/{wb_run.id}",
                     verbose=2
                 ),
-                log_interval=50)
+                log_interval=5)
 
     #### Save the model ########################################
     model.save(output_folder+'/models/success_model.pkl')

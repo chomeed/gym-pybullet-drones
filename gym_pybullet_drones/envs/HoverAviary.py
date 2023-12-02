@@ -76,7 +76,7 @@ class HoverAviary(BaseRLAviary):
         """
         state = self._getDroneStateVector(0)
         #ret = -np.linalg.norm(self.TARGET_POS-state[0:3])**4
-        ret = max(0, 3 - np.linalg.norm(self.TARGET_POS-state[0:3])) # state[0:3] -> 드론의 현재 (x, y, z) 좌표 
+        ret = max(0, 2 - np.linalg.norm(self.TARGET_POS-state[0:3])**2) # state[0:3] -> 드론의 현재 (x, y, z) 좌표 
         return ret
 
     ################################################################################
@@ -90,15 +90,22 @@ class HoverAviary(BaseRLAviary):
             Whether the current episode is done.
 
         """
-        # state = self._getDroneStateVector(0)
+        import math
+        state = self._getDroneStateVector(0)
+        roll, pitch = state[7:9]
+        if roll > math.pi/2 or roll < -math.pi/2 or pitch > math.pi/2 or pitch < -math.pi/2:
+            return True 
+        else:
+            return False    
+
         # if np.linalg.norm(self.TARGET_POS-state[0:3]) < .0001:
         #     return True
         
         # Terminates when time is over
-        if self.step_counter/self.PYB_FREQ > self.EPISODE_LEN_SEC:
-            return True
-        else:
-            return False
+        # if self.step_counter/self.PYB_FREQ > self.EPISODE_LEN_SEC:
+        #     return True
+        # else:
+        #     return False
         
     ################################################################################
     

@@ -4,7 +4,7 @@ import pybullet as p
 from gymnasium import spaces
 from collections import deque
 
-from gym_pybullet_drones.envs.BaseAviary import BaseAviary
+from gym_pybullet_drones.envs.BaseAviaryCustom import BaseAviary
 from gym_pybullet_drones.utils.enums import DroneModel, Physics, ActionType, ObservationType, ImageType
 from gym_pybullet_drones.control.DSLPIDControl import DSLPIDControl
 
@@ -63,7 +63,7 @@ class BaseRLAviary(BaseAviary):
 
         """
         #### Create a buffer for the last 10 actions ###############
-        self.ACTION_BUFFER_SIZE = 10
+        self.ACTION_BUFFER_SIZE = 10 
         self.action_buffer = deque(maxlen=self.ACTION_BUFFER_SIZE)
         ####
         vision_attributes = True if obs == ObservationType.RGB else False
@@ -147,8 +147,8 @@ class BaseRLAviary(BaseAviary):
         else:
             print("[ERROR] in BaseRLAviary._actionSpace()")
             exit()
-        act_lower_bound = np.array([-1*np.ones(size) for i in range(self.NUM_DRONES)])
-        act_upper_bound = np.array([+1*np.ones(size) for i in range(self.NUM_DRONES)])
+        act_lower_bound = np.array([-1*np.ones(size) for i in range(self.NUM_DRONES)], dtype=np.float32)
+        act_upper_bound = np.array([+1*np.ones(size) for i in range(self.NUM_DRONES)], dtype=np.float32)
         #
         for i in range(self.ACTION_BUFFER_SIZE):
             self.action_buffer.append(np.zeros((self.NUM_DRONES,size)))
@@ -252,7 +252,8 @@ class BaseRLAviary(BaseAviary):
         if self.OBS_TYPE == ObservationType.RGB:
             return spaces.Box(low=0,
                               high=255,
-                              shape=(self.NUM_DRONES, self.IMG_RES[1], self.IMG_RES[0], 4), dtype=np.uint8)
+                            #   shape=(self.NUM_DRONES, self.IMG_RES[1], self.IMG_RES[0], 4), dtype=np.uint8)
+                              shape=(self.NUM_DRONES, 4, self.IMG_RES[1], self.IMG_RES[0]), dtype=np.uint8)
         elif self.OBS_TYPE == ObservationType.KIN:
             ############################################################
             #### OBS SPACE OF SIZE 12
@@ -303,7 +304,7 @@ class BaseRLAviary(BaseAviary):
                                           path=self.ONBOARD_IMG_PATH+"drone_"+str(i),
                                           frame_num=int(self.step_counter/self.IMG_CAPTURE_FREQ)
                                           )
-            return np.array([self.rgb[i] for i in range(self.NUM_DRONES)]).astype('float32')
+            return np.array([self.rgb[i] for i in range(self.NUM_DRONES)]).astype('float32').transpose((0, 3, 1, 2))
         elif self.OBS_TYPE == ObservationType.KIN:
             ############################################################
             #### OBS SPACE OF SIZE 12
