@@ -77,7 +77,7 @@ def run(steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT
     print('[INFO] Observation space:', train_env.observation_space)
 
     #### Train the model #######################################
-    model = SAC('MutliInputPolicy',
+    model = SAC('MultiInputPolicy',
                 train_env,
                 # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
                 # tensorboard_log=filename+'/tb/',
