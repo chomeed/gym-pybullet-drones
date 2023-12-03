@@ -34,8 +34,8 @@ class BaseAviary(gym.Env):
                  gui=False,
                  record=False,
                  obstacles=False,
-                 user_debug_gui=True,
-                 vision_attributes=False,
+                 user_debug_gui=False,
+                 vision_attributes=True,
                  output_folder='results'
                  ):
         """Initialization of a generic aviary environment.
@@ -148,8 +148,12 @@ class BaseAviary(gym.Env):
         if self.GUI:
             #### With debug GUI ########################################
             self.CLIENT = p.connect(p.GUI) # p.connect(p.GUI, options="--opengl2")
+            print("YOLOYOYLYLOYLOYLYOLYOLYOYLOYLOYLOYL")
+            # p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
             for i in [p.COV_ENABLE_RGB_BUFFER_PREVIEW, p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW]:
-                p.configureDebugVisualizer(i, 0, physicsClientId=self.CLIENT)
+                p.configureDebugVisualizer(i, 1, physicsClientId=self.CLIENT)
+                print("무하하하하핳하하핳ㅎㄴㅇㅓㅏ너하ㄴㅓㅏㅣㅇ허")
+
             p.resetDebugVisualizerCamera(cameraDistance=3,
                                          cameraYaw=-30,
                                          cameraPitch=-30,
@@ -290,7 +294,7 @@ class BaseAviary(gym.Env):
 
         """
         #### Save PNG video frames if RECORD=True and GUI=False ####
-        if self.RECORD and not self.GUI and self.step_counter%self.CAPTURE_FREQ == 0:
+        if self.RECORD and self.step_counter%self.CAPTURE_FREQ == 0:
             [w, h, rgb, dep, seg] = p.getCameraImage(width=self.VID_WIDTH,
                                                      height=self.VID_HEIGHT,
                                                      shadow=1,
@@ -307,16 +311,17 @@ class BaseAviary(gym.Env):
             # seg = ((seg-np.min(seg)) * 255 / (np.max(seg)-np.min(seg))).astype('uint8')
             # (Image.fromarray(np.reshape(seg, (h, w)))).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
             self.FRAME_NUM += 1
-            if self.VISION_ATTR:
-                for i in range(self.NUM_DRONES):
-                    self.rgb[i], self.dep[i], self.seg[i] = self._getDroneImages(i)
-                    #### Printing observation to PNG frames example ############
-                    self._exportImage(img_type=ImageType.RGB, # ImageType.BW, ImageType.DEP, ImageType.SEG
-                                    img_input=self.rgb[i],
-                                    path=self.ONBOARD_IMG_PATH+"/drone_"+str(i)+"/",
-                                    frame_num=int(self.step_counter/self.IMG_CAPTURE_FREQ)
-                                    )
-        #### Read the GUI's input parameters #######################
+        if self.VISION_ATTR:
+            for i in range(self.NUM_DRONES):
+                self.rgb[i], self.dep[i], self.seg[i] = self._getDroneImages(i)
+                #### Printing observation to PNG frames example ############
+                # self._exportImage(img_type=ImageType.RGB, # ImageType.BW, ImageType.DEP, ImageType.SEG
+                #                 img_input=self.rgb[i],
+                #                 path="results/drone_" + str(i) +"/",
+                #                 # path=self.ONBOARD_IMG_PATH+"/drone_"+str(i)+"/",
+                #                 frame_num=int(self.step_counter/self.IMG_CAPTURE_FREQ)
+                #                 )
+        #### Read the GUI's input parameters #######################    
         if self.GUI and self.USER_DEBUG:
             current_input_switch = p.readUserDebugParameter(self.INPUT_SWITCH, physicsClientId=self.CLIENT)
             if current_input_switch > self.last_input_switch:
@@ -381,6 +386,7 @@ class BaseAviary(gym.Env):
         info = self._computeInfo()
         #### Advance the step counter ##############################
         self.step_counter = self.step_counter + (1 * self.PYB_STEPS_PER_CTRL)
+
         return obs, reward, terminated, truncated, info
     
     ################################################################################
@@ -485,24 +491,22 @@ class BaseAviary(gym.Env):
         self.PLANE_ID = p.loadURDF("plane.urdf", physicsClientId=self.CLIENT)
 
         ##
-
         import random
         import math
 
         def generate_random_rpy(max_roll_pitch=10):
-                roll = random.uniform(-max_roll_pitch, max_roll_pitch)
-                pitch = random.uniform(-max_roll_pitch, max_roll_pitch)
-                yaw = random.uniform(-math.pi, math.pi)
+            rolls = [random.uniform(-max_roll_pitch, max_roll_pitch) for _ in range(self.NUM_DRONES)]
+            pitches = [random.uniform(-max_roll_pitch, max_roll_pitch) for _ in range(self.NUM_DRONES)]
+            yaws = [random.uniform(-np.pi, np.pi) for _ in range(self.NUM_DRONES)]
 
-                # Convert angles to radians
-                roll_rad = math.radians(roll)
-                pitch_rad = math.radians(pitch)
-                yaw_rad = math.radians(yaw)
+            # Convert angles to radians
+            rolls_rad = np.radians(rolls)
+            pitches_rad = np.radians(pitches)
+            yaws_rad = np.radians(yaws)
 
-                return np.array([[roll_rad, pitch_rad, yaw_rad] * self.NUM_DRONES])
+            return np.array([rolls_rad, pitches_rad, yaws_rad]).transpose()
 
         self.INIT_RPYS = generate_random_rpy()
-
         ##
 
         self.DRONE_IDS = np.array([p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+self.URDF),
@@ -634,7 +638,8 @@ class BaseAviary(gym.Env):
                                                  viewMatrix=DRONE_CAM_VIEW,
                                                  projectionMatrix=DRONE_CAM_PRO,
                                                  flags=SEG_FLAG,
-                                                 physicsClientId=self.CLIENT
+                                                 physicsClientId=self.CLIENT,
+                                                 renderer=p.ER_BULLET_HARDWARE_OPENGL
                                                  )
         rgb = np.reshape(rgb, (h, w, 4))
         dep = np.reshape(dep, (h, w))

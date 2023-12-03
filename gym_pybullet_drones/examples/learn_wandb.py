@@ -44,9 +44,9 @@ DEFAULT_RECORD_VIDEO = False
 DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = False
 
-DEFAULT_OBS = ObservationType('kin') # 'kin' or 'rgb'
+DEFAULT_OBS = ObservationType('rgbkin') # 'kin' or 'rgb'
 DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one_d_pid'
-DEFAULT_AGENTS = 2
+DEFAULT_AGENTS = 1
 DEFAULT_MA = False
 
 def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True, wb_run=None, **kwargs):
@@ -62,10 +62,10 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     if not multiagent:
         train_env = make_vec_env(HoverAviary,
                                  env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=1,
+                                 n_envs=10,
                                  seed=0
                                  )
-        eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
+        # eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
     else:
         print("Single Agent Only")
         return
@@ -75,12 +75,22 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     print('[INFO] Observation space:', train_env.observation_space)
 
     #### Train the model #######################################
-    model = SAC('MlpPolicy',
+    model = SAC('MultiInputPolicy',
                 train_env,
                 # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
-                # tensorboard_log=filename+'/tb/',
-                tensorboard_log=output_folder + f"/runs/{wb_run.id}",
+                # tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
+
+    # callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=np.inf,
+    #                                                  verbose=1)
+    # eval_callback = EvalCallback(train_env,
+    #                              callback_on_new_best=callback_on_best,
+    #                              verbose=1,
+    #                              best_model_save_path=filename+'/',
+    #                              log_path=filename+'/',
+    #                              eval_freq=int(2000),
+    #                              deterministic=True,
+    #                              render=False)
 
     model.learn(total_timesteps=1*int(1e6) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
@@ -88,6 +98,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                     model_save_path=output_folder + f"/models/{wb_run.id}",
                     verbose=2
                 ),
+                # callback=eval_callback,
                 log_interval=50)
 
     #### Save the model ########################################
@@ -152,27 +163,17 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
         act2 = action.squeeze()
         print("Obs:", obs, "\tAction", action, "\tReward:", reward, "\tTerminated:", terminated, "\tTruncated:", truncated)
         if DEFAULT_OBS == ObservationType.KIN:
-            if not multiagent:
-                logger.log(drone=0,
-                    timestamp=i/test_env.CTRL_FREQ,
-                    state=np.hstack([obs2[0:3],
-                                        np.zeros(4),
-                                        obs2[3:15],
-                                        act2
-                                        ]),
-                    control=np.zeros(12)
-                    )
-            else:
-                for d in range(DEFAULT_AGENTS):
-                    logger.log(drone=d,
-                        timestamp=i/test_env.CTRL_FREQ,
-                        state=np.hstack([obs2[d][0:3],
-                                            np.zeros(4),
-                                            obs2[d][3:15],
-                                            act2[d]
-                                            ]),
-                        control=np.zeros(12)
-                        )
+            
+            logger.log(drone=0,
+                timestamp=i/test_env.CTRL_FREQ,
+                state=np.hstack([obs2[0:3],
+                                    np.zeros(4),
+                                    obs2[3:15],
+                                    act2
+                                    ]),
+                control=np.zeros(12)
+                )
+
         test_env.render()
         print(terminated)
         sync(i, start, test_env.CTRL_TIMESTEP)

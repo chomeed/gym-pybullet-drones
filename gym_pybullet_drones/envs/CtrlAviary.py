@@ -1,7 +1,7 @@
 import numpy as np
 from gymnasium import spaces
 
-from gym_pybullet_drones.envs.BaseAviary import BaseAviary
+from gym_pybullet_drones.envs.BaseAviaryCustom import BaseAviary
 from gym_pybullet_drones.utils.enums import DroneModel, Physics
 
 class CtrlAviary(BaseAviary):
@@ -18,7 +18,7 @@ class CtrlAviary(BaseAviary):
                  physics: Physics=Physics.PYB,
                  pyb_freq: int = 240,
                  ctrl_freq: int = 240,
-                 gui=False,
+                 gui=True,
                  record=False,
                  obstacles=False,
                  user_debug_gui=True,

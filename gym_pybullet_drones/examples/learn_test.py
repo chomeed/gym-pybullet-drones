@@ -29,7 +29,6 @@ from stable_baselines3.common.evaluation import evaluate_policy
 
 from gym_pybullet_drones.utils.Logger import Logger
 from gym_pybullet_drones.envs.HoverAviary import HoverAviary
-from gym_pybullet_drones.envs.MultiHoverAviary import MultiHoverAviary
 from gym_pybullet_drones.utils.utils import sync, str2bool
 from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 
@@ -48,7 +47,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
   
     train_env = make_vec_env(HoverAviary,
                                 env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                n_envs=3,
+                                n_envs=1,
                                 seed=0
                                 )
     eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
@@ -117,17 +116,6 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                                         ]),
                     control=np.zeros(12)
                     )
-            else:
-                for d in range(DEFAULT_AGENTS):
-                    logger.log(drone=d,
-                        timestamp=i/test_env.CTRL_FREQ,
-                        state=np.hstack([obs2[d][0:3],
-                                            np.zeros(4),
-                                            obs2[d][3:15],
-                                            act2[d]
-                                            ]),
-                        control=np.zeros(12)
-                        )
         test_env.render()
         print(terminated)
         sync(i, start, test_env.CTRL_TIMESTEP)
