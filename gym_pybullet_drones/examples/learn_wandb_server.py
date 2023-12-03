@@ -44,9 +44,9 @@ DEFAULT_RECORD_VIDEO = False
 DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = False
 
-DEFAULT_OBS = ObservationType('kin') # 'kin' or 'rgb'
+DEFAULT_OBS = ObservationType('rgbkin') # 'kin' or 'rgb'
 DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one_d_pid'
-DEFAULT_AGENTS = 2
+DEFAULT_AGENTS = 1
 DEFAULT_MA = False
 
 DEFAULT_STEPS = 1e6
@@ -64,7 +64,7 @@ def run(steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT
     if not multiagent:
         train_env = make_vec_env(HoverAviary,
                                  env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=1,
+                                 n_envs=10,
                                  seed=0
                                  )
         eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
@@ -77,14 +77,14 @@ def run(steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT
     print('[INFO] Observation space:', train_env.observation_space)
 
     #### Train the model #######################################
-    model = SAC('MlpPolicy',
+    model = SAC('MutliInputPolicy',
                 train_env,
                 # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
                 # tensorboard_log=filename+'/tb/',
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
-    model.load('/model/R018_discrete.pkl')
+    # model.load('/model/R018_discrete.pkl')
 
     model.learn(total_timesteps=int(steps) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
