@@ -49,7 +49,7 @@ DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one
 DEFAULT_AGENTS = 1
 DEFAULT_MA = False
 
-DEFAULT_STEPS = 3e5
+DEFAULT_STEPS = 300000
 
 def run(steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True, wb_run=None, **kwargs):
 
