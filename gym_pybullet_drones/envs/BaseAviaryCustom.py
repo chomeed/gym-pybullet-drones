@@ -148,33 +148,20 @@ class BaseAviary(gym.Env):
         if self.GUI:
             #### With debug GUI ########################################
             self.CLIENT = p.connect(p.GUI) # p.connect(p.GUI, options="--opengl2")
-            print("YOLOYOYLYLOYLOYLYOLYOLYOYLOYLOYLOYL")
-            # p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
+            p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0, physicsClientId=self.CLIENT)
             for i in [p.COV_ENABLE_RGB_BUFFER_PREVIEW, p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW]:
-                p.configureDebugVisualizer(i, 1, physicsClientId=self.CLIENT)
-                print("무하하하하핳하하핳ㅎㄴㅇㅓㅏ너하ㄴㅓㅏㅣㅇ허")
+                p.configureDebugVisualizer(i, 0, physicsClientId=self.CLIENT)
 
-            p.resetDebugVisualizerCamera(cameraDistance=3,
-                                         cameraYaw=-30,
-                                         cameraPitch=-30,
-                                         cameraTargetPosition=[0, 0, 0],
-                                         physicsClientId=self.CLIENT
-                                         )
-            ret = p.getDebugVisualizerCamera(physicsClientId=self.CLIENT)
-            print("viewMatrix", ret[2])
-            print("projectionMatrix", ret[3])
-            if self.USER_DEBUG:
-                #### Add input sliders to the GUI ##########################
-                self.SLIDERS = -1*np.ones(4)
-                for i in range(4):
-                    self.SLIDERS[i] = p.addUserDebugParameter("Propeller "+str(i)+" RPM", 0, self.MAX_RPM, self.HOVER_RPM, physicsClientId=self.CLIENT)
-                self.INPUT_SWITCH = p.addUserDebugParameter("Use GUI RPM", 9999, -1, 0, physicsClientId=self.CLIENT)
+            
         else:
             #### Without debug GUI #####################################
             self.CLIENT = p.connect(p.DIRECT)
             #### Uncomment the following line to use EGL Render Plugin #
             #### Instead of TinyRender (CPU-based) in PYB's Direct mode
-            # if platform == "linux": p.setAdditionalSearchPath(pybullet_data.getDataPath()); plugin = p.loadPlugin(egl.get_filename(), "_eglRendererPlugin"); print("plugin=", plugin)
+            # if platform == "linux": 
+            # p.setAdditionalSearchPath(pybullet_data.getDataPath())
+            # plugin = p.loadPlugin(egl.get_filename(), "_eglRendererPlugin") 
+            # print("plugin=", plugin)            
             if self.RECORD:
                 #### Set the camera parameters to save frames in DIRECT mode
                 self.VID_WIDTH=int(640)
@@ -194,6 +181,23 @@ class BaseAviary(gym.Env):
                                                             nearVal=0.1,
                                                             farVal=1000.0
                                                             )
+        p.resetDebugVisualizerCamera(cameraDistance=3,
+                                         cameraYaw=-30,
+                                         cameraPitch=-30,
+                                         cameraTargetPosition=[0, 0, 0],
+                                         physicsClientId=self.CLIENT
+                                         )
+        ret = p.getDebugVisualizerCamera(physicsClientId=self.CLIENT)
+        print("viewMatrix", ret[2])
+        print("projectionMatrix", ret[3])
+        if self.USER_DEBUG:
+            #### Add input sliders to the GUI ##########################
+            self.SLIDERS = -1*np.ones(4)
+            for i in range(4):
+                self.SLIDERS[i] = p.addUserDebugParameter("Propeller "+str(i)+" RPM", 0, self.MAX_RPM, self.HOVER_RPM, physicsClientId=self.CLIENT)
+            self.INPUT_SWITCH = p.addUserDebugParameter("Use GUI RPM", 9999, -1, 0, physicsClientId=self.CLIENT)
+
+            
         #### Set initial poses #####################################
         if initial_xyzs is None:
             self.INIT_XYZS = np.vstack([np.array([x*4*self.L for x in range(self.NUM_DRONES)]), \
@@ -315,12 +319,12 @@ class BaseAviary(gym.Env):
             for i in range(self.NUM_DRONES):
                 self.rgb[i], self.dep[i], self.seg[i] = self._getDroneImages(i)
                 #### Printing observation to PNG frames example ############
-                # self._exportImage(img_type=ImageType.RGB, # ImageType.BW, ImageType.DEP, ImageType.SEG
-                #                 img_input=self.rgb[i],
-                #                 path="results/drone_" + str(i) +"/",
-                #                 # path=self.ONBOARD_IMG_PATH+"/drone_"+str(i)+"/",
-                #                 frame_num=int(self.step_counter/self.IMG_CAPTURE_FREQ)
-                #                 )
+                self._exportImage(img_type=ImageType.RGB, # ImageType.BW, ImageType.DEP, ImageType.SEG
+                                img_input=self.rgb[i],
+                                path="results/drone_" + str(i) +"/",
+                                # path=self.ONBOARD_IMG_PATH+"/drone_"+str(i)+"/",
+                                frame_num=int(self.step_counter/self.IMG_CAPTURE_FREQ)
+                                )
         #### Read the GUI's input parameters #######################    
         if self.GUI and self.USER_DEBUG:
             current_input_switch = p.readUserDebugParameter(self.INPUT_SWITCH, physicsClientId=self.CLIENT)
@@ -507,6 +511,7 @@ class BaseAviary(gym.Env):
             return np.array([rolls_rad, pitches_rad, yaws_rad]).transpose()
 
         self.INIT_RPYS = generate_random_rpy()
+        self.INIT_RPYS = np.zeros((self.NUM_DRONES, 3))
         ##
 
         self.DRONE_IDS = np.array([p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+self.URDF),
@@ -639,7 +644,7 @@ class BaseAviary(gym.Env):
                                                  projectionMatrix=DRONE_CAM_PRO,
                                                  flags=SEG_FLAG,
                                                  physicsClientId=self.CLIENT,
-                                                 renderer=p.ER_BULLET_HARDWARE_OPENGL
+                                                 renderer=p.ER_TINY_RENDERER
                                                  )
         rgb = np.reshape(rgb, (h, w, 4))
         dep = np.reshape(dep, (h, w))

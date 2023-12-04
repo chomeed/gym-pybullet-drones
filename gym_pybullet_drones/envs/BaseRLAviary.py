@@ -67,7 +67,7 @@ class BaseRLAviary(BaseAviary):
         self.ACTION_BUFFER_SIZE = 10 
         self.action_buffer = deque(maxlen=self.ACTION_BUFFER_SIZE)
         ####
-        vision_attributes = True if obs == ObservationType.RGB else False
+        # vision_attributes = True if obs == ObservationType.RGB else False
         vision_attributes = True
         self.OBS_TYPE = obs
         self.ACT_TYPE = act
@@ -353,8 +353,13 @@ class BaseRLAviary(BaseAviary):
             ret = np.array([obs_12[i, :] for i in range(self.NUM_DRONES)]).astype('float32')
             #### Add action buffer to observation #######################
             for i in range(self.ACTION_BUFFER_SIZE):
-                ret = np.hstack([ret, np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)])])
+                try: 
+                    ret = np.hstack([ret, np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)])])
+                except: 
+                    print("error occured!")
 
+            rgb_res = np.array([self.rgb[i] for i in range(self.NUM_DRONES)]).astype('uint8')
+         
             return {'obs_rgb': np.array([self.rgb[i] for i in range(self.NUM_DRONES)]).astype('uint8'),
                     'obs_kin': ret}
 

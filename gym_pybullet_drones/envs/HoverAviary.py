@@ -1,7 +1,11 @@
 import numpy as np
+import pybullet as p
+import pkg_resources
 
 from gym_pybullet_drones.envs.BaseRLAviary import BaseRLAviary
 from gym_pybullet_drones.utils.enums import DroneModel, Physics, ActionType, ObservationType
+
+import random
 
 class HoverAviary(BaseRLAviary):
     """Single agent RL problem: hover at position."""
@@ -48,7 +52,10 @@ class HoverAviary(BaseRLAviary):
             The type of action space (1 or 3D; RPMS, thurst and torques, or waypoint with PID control)
 
         """
-        self.TARGET_POS = np.array([0,0,1])
+
+        targetX = random.uniform(1, 2)
+        targetY = random.uniform(-1, 1)
+        self.TARGET_POS = np.array([targetX,targetY,1])
         self.EPISODE_LEN_SEC = 8
         super().__init__(drone_model=drone_model,
                          num_drones=1,
@@ -65,6 +72,20 @@ class HoverAviary(BaseRLAviary):
 
     ################################################################################
     
+    def _addObstacles(self):
+        """Add obstacles to the environment.
+
+        Only if the observation is of type RGB, 4 landmarks are added.
+        Overrides BaseAviary's method.
+
+        """
+        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position.urdf'), self.TARGET_POS,
+                                                    p.getQuaternionFromEuler([0,0,0]),
+                                                    useFixedBase=True,   # Doesn't move
+                                                    #flags = p.URDF_USE_INERTIA_FROM_FILE,
+                                                    physicsClientId=self.CLIENT
+                                                )
+
     def _computeReward(self):
         """Computes the current reward value.
 
@@ -152,3 +173,45 @@ class HoverAviary(BaseRLAviary):
 
         """
         return {"answer": 42} #### Calculated by the Deep Thought supercomputer in 7.5M years
+
+
+    def reset(self,
+              seed : int = None,
+              options : dict = None):
+        """Resets the environment.
+
+        Parameters
+        ----------
+        seed : int, optional
+            Random seed.
+        options : dict[..], optional
+            Additinonal options, unused
+
+        Returns
+        -------
+        ndarray | dict[..]
+            The initial observation, check the specific implementation of `_computeObs()`
+            in each subclass for its format.
+        dict[..]
+            Additional information as a dictionary, check the specific implementation of `_computeInfo()`
+            in each subclass for its format.
+
+        """
+
+        # TODO : initialize random number generator with seed
+
+        p.resetSimulation(physicsClientId=self.CLIENT)
+        #### Housekeeping ##########################################
+        self._housekeeping()
+        #### Update and store the drones kinematic information #####
+        self._updateAndStoreKinematicInformation()
+        #### Start video recording #################################
+        self._startVideoRecording()
+        #### Return the initial observation ########################
+        initial_obs = self._computeObs()
+        initial_info = self._computeInfo()
+        targetX = random.uniform(1, 2)
+        targetY = random.uniform(-1, 1)
+        self.TARGET_POS = np.array([targetX,targetY,1])
+        
+        return initial_obs, initial_info
