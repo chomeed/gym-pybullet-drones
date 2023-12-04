@@ -319,12 +319,12 @@ class BaseAviary(gym.Env):
             for i in range(self.NUM_DRONES):
                 self.rgb[i], self.dep[i], self.seg[i] = self._getDroneImages(i)
                 #### Printing observation to PNG frames example ############
-                self._exportImage(img_type=ImageType.RGB, # ImageType.BW, ImageType.DEP, ImageType.SEG
-                                img_input=self.rgb[i],
-                                path="results/drone_" + str(i) +"/",
-                                # path=self.ONBOARD_IMG_PATH+"/drone_"+str(i)+"/",
-                                frame_num=int(self.step_counter/self.IMG_CAPTURE_FREQ)
-                                )
+                # self._exportImage(img_type=ImageType.RGB, # ImageType.BW, ImageType.DEP, ImageType.SEG
+                #                 img_input=self.rgb[i],
+                #                 path="results/drone_" + str(i) +"/",
+                #                 # path=self.ONBOARD_IMG_PATH+"/drone_"+str(i)+"/",
+                #                 frame_num=int(self.step_counter/self.IMG_CAPTURE_FREQ)
+                #                 )
         #### Read the GUI's input parameters #######################    
         if self.GUI and self.USER_DEBUG:
             current_input_switch = p.readUserDebugParameter(self.INPUT_SWITCH, physicsClientId=self.CLIENT)
