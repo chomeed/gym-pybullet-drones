@@ -511,7 +511,6 @@ class BaseAviary(gym.Env):
             return np.array([rolls_rad, pitches_rad, yaws_rad]).transpose()
 
         self.INIT_RPYS = generate_random_rpy()
-        self.INIT_RPYS = np.zeros((self.NUM_DRONES, 3))
         ##
 
         self.DRONE_IDS = np.array([p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+self.URDF),

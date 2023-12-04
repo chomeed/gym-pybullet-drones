@@ -53,8 +53,8 @@ class HoverAviary(BaseRLAviary):
 
         """
 
-        targetX = random.uniform(1, 2)
-        targetY = random.uniform(-1, 1)
+        targetX = random.uniform(-2, 2)
+        targetY = random.uniform(-2, 2)
         self.TARGET_POS = np.array([targetX,targetY,1])
         self.EPISODE_LEN_SEC = 8
         super().__init__(drone_model=drone_model,
@@ -104,7 +104,7 @@ class HoverAviary(BaseRLAviary):
         # else:
         #     ret = -1
 
-        if np.linalg.norm(self.TARGET_POS-state[0:3]) < 0.1:
+        if np.linalg.norm(self.TARGET_POS-state[0:3]) < 1:
             ret = max(0, 1 - np.linalg.norm(self.TARGET_POS-state[0:3]))
         else:
             ret = -1

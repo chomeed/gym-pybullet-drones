@@ -53,6 +53,7 @@ DEFAULT_STEPS = 300000
 
 def run(steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True, wb_run=None, **kwargs):
 
+    print("Steps", steps)
     if wb_run == None: 
         print("Wandb Key is not given")
         return
@@ -84,7 +85,17 @@ def run(steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
 
-    # model.load('/model/R018_discrete.pkl')
+    if os.path.isfile('models'+'/hover_without_green.pkl'):
+        print("시작해보자222")
+        path = 'models'+'/hover_without_green.pkl'
+        model = SAC.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
+                verbose=1)
+        # model = model.load(path, print_system_info=True)
+        print("끝")
+    else: 
+        print("not found")
+    # path = '/models/hover_without_green.pkl'
+    # model = SAC.load(path, print_system_info=True)
 
     model.learn(total_timesteps=int(steps) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
@@ -116,23 +127,16 @@ def run(steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT
         path = filename+'/best_model.pkl'
         model = SAC.load(path)
     else:
-        print("[ERROR]: no model under the specified path", filename)
+        print("[ERROR]: no model under the specified path", filename) 
     
     #### Show (and record a video of) the model's performance ##
-    if not multiagent:
-        print("TEST ENV RECORD VIDEO:", record_video)
-        test_env = HoverAviary(gui=gui,
-                               obs=DEFAULT_OBS,
-                               act=DEFAULT_ACT,
-                               record=record_video)
-        test_env_nogui = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
-    else:
-        test_env = MultiHoverAviary(gui=gui,
-                                        num_drones=DEFAULT_AGENTS,
-                                        obs=DEFAULT_OBS,
-                                        act=DEFAULT_ACT,
-                                        record=record_video)
-        test_env_nogui = MultiHoverAviary(num_drones=DEFAULT_AGENTS, obs=DEFAULT_OBS, act=DEFAULT_ACT)
+    print("TEST ENV RECORD VIDEO:", record_video)
+    test_env = HoverAviary(gui=gui,
+                            obs=DEFAULT_OBS,
+                            act=DEFAULT_ACT,
+                            record=record_video)
+    test_env_nogui = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
+    
     logger = Logger(logging_freq_hz=int(test_env.CTRL_FREQ),
                 num_drones=DEFAULT_AGENTS if multiagent else 1,
                 output_folder=output_folder,
@@ -155,7 +159,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_folder',      default=DEFAULT_OUTPUT_FOLDER, type=str,           help='Folder where to save logs (default: "results")', metavar='')
     parser.add_argument('--colab',              default=DEFAULT_COLAB,         type=bool,          help='Whether example is being run by a notebook (default: "False")', metavar='')
     parser.add_argument('--wandb_key')
-    parser.add_argument('--steps')
+    parser.add_argument('--steps',              default=DEFAULT_STEPS)
     ARGS = parser.parse_args()
 
     wandb.login(key=ARGS.wandb_key)
