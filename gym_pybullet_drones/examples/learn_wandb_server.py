@@ -84,7 +84,8 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
                 # tensorboard_log=filename+'/tb/',
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
-
+    # print(os.listdir('/root/models'))
+    print(os.listdir(checkpoint_dir))
     if os.path.isfile(checkpoint_dir+'/hover_without_green.pkl'):
         print("시작해보자222")
         path = checkpoint_dir+'/hover_without_green.pkl'
