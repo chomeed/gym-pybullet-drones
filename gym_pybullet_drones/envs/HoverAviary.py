@@ -57,6 +57,7 @@ class HoverAviary(BaseRLAviary):
         targetY = random.uniform(-2, 2)
         self.TARGET_POS = np.array([targetX,targetY,1])
         self.EPISODE_LEN_SEC = 8
+        self.prevDisplacement = np.linalg.norm(self.TARGET_POS - self.INIT_XYZS)
         super().__init__(drone_model=drone_model,
                          num_drones=1,
                          initial_xyzs=initial_xyzs,
@@ -96,18 +97,30 @@ class HoverAviary(BaseRLAviary):
 
         """
         state = self._getDroneStateVector(0)
-        #ret = -np.linalg.norm(self.TARGET_POS-state[0:3])**4
-        # ret = max(0, 1 - np.linalg.norm(self.TARGET_POS-state[0:3])) # state[0:3] -> 드론의 현재 (x, y, z) 좌표 
+        ret = 0 
 
-        # if np.linalg.norm(self.TARGET_POS-state[0:3]) < 0.18:
-        #     ret = 1
-        # else:
-        #     ret = -1
+        # 거리 - 이전 좌표와의 거리와 비교 
+        # self.distPrev
+        currentPosition = state[0:3] 
+        currentDisplacement = np.linalg.norm(self.TARGET_POS - currentPosition)
         
-        if np.linalg.norm(self.TARGET_POS-state[0:3]) < 1:
-            ret = max(0, 1 - np.linalg.norm(self.TARGET_POS-state[0:3]))
-        else:
-            ret = -1
+        if currentDisplacement < self.prevDisplacement: # closer 
+            ret += 1 
+        else: 
+            ret += -1 
+            
+        # 정확한 위치 - 추가 보상 
+        if currentDisplacement < 1:
+            ret += 1 - np.linalg.norm(self.TARGET_POS-state[0:3])
+
+        # 시간 
+        ret -= 0.02 
+
+        # 진동 
+        # 기울어짐 
+        # 경로의 급격한 변화
+        # pillar 충돌 방지  
+        # 초록색 박스에서 속도 줄이기 
 
         return ret
 
