@@ -56,7 +56,7 @@ class HoverAviary(BaseRLAviary):
         targetX = random.uniform(-2, 2)
         targetY = random.uniform(-2, 2)
         self.TARGET_POS = np.array([targetX,targetY,1])
-        self.EPISODE_LEN_SEC = 8
+        self.EPISODE_LEN_SEC = 20
 
         super().__init__(drone_model=drone_model,
                         num_drones=1,
@@ -72,7 +72,9 @@ class HoverAviary(BaseRLAviary):
                         )
 
         self.prevDisplacement = np.linalg.norm(self.TARGET_POS - self.INIT_XYZS)
-        
+        self.prevEnergy = 0
+        self.prevSpeed = 0 
+        self.isArrivedCount = 0 
 
     ################################################################################
     
@@ -102,22 +104,39 @@ class HoverAviary(BaseRLAviary):
         state = self._getDroneStateVector(0)
         ret = 0 
 
-        # 거리 - 이전 좌표와의 거리와 비교 
-        # self.distPrev
+        # displacement, energy, overspeed, arrival, accuracy 
+        weights = [1, 1, 1, 100, 1]
+
+        # displacement
         currentPosition = state[0:3] 
         currentDisplacement = np.linalg.norm(self.TARGET_POS - currentPosition)
-        
-        if currentDisplacement < self.prevDisplacement: # closer 
-            ret += 1 
-        else: 
-            ret += -1 
-            
-        # 정확한 위치 - 추가 보상 
-        if currentDisplacement < 1:
-            ret += 1 - np.linalg.norm(self.TARGET_POS-state[0:3])
+        displacementDelta = self.prevDisplacement - currentDisplacement 
+        self.prevDisplacement = currentDisplacement
 
-        # 시간 
-        ret -= 0.02 
+        # energy 
+        currentRPM = self.action_buffer[-1]
+        currentEnergy = np.linalg.norm(currentRPM)
+        energyCost = -abs(currentEnergy - self.prevEnergy)
+        self.prevEnergy = currentEnergy
+
+        # overspeed 
+        if np.max(currentRPM) > self.MAX_RPM:
+            overspeed = -(np.linalg.norm(currentRPM - self.MAX_RPM))
+        else:
+            overspeed = 0
+        
+        # arrival, accuracy -- within the goal 
+        if currentDisplacement < 0.25:
+            # arrival 
+            self.isArrivedCount += 1
+            isArrived = 1 - currentDisplacement*4
+        else: 
+            isArrived = 0
+
+        check = [displacementDelta, energyCost, overspeed, int(self.isArrivedCount == 1), isArrived]
+        ret = np.dot(weights, check)
+
+        # minimize turbulence using rpys and quat and ang_v
 
         # 진동 
         # 기울어짐 
@@ -125,7 +144,6 @@ class HoverAviary(BaseRLAviary):
         # pillar 충돌 방지  
         # 초록색 박스에서 속도 줄이기 
 
-        self.prevDisplacement = currentDisplacement
 
         return ret
 

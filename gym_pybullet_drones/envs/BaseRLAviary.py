@@ -186,7 +186,7 @@ class BaseRLAviary(BaseAviary):
             commanded to the 4 motors of each drone.
 
         """
-        self.action_buffer.append(action)
+
         rpm = np.zeros((self.NUM_DRONES,4))
         for k in range(action.shape[0]):
             target = action[k, :]
@@ -258,7 +258,7 @@ class BaseRLAviary(BaseAviary):
                             #   shape=(self.NUM_DRONES, 4, self.IMG_RES[1], self.IMG_RES[0]), dtype=np.uint8)
         elif self.OBS_TYPE == ObservationType.KIN:
             ############################################################
-            #### OBS SPACE OF SIZE 12
+            #### OBS SPACE OF SIZE 12 
             #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ + 과거 RPM 값 
             lo = -np.inf
             hi = np.inf
@@ -305,6 +305,7 @@ class BaseRLAviary(BaseAviary):
     ################################################################################
 
     def _computeObs(self):
+        # print(self.action_buffer)
         """Returns the current observation of the environment.
 
         Returns
