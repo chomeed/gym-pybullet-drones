@@ -125,6 +125,8 @@ class HoverAviary(BaseRLAviary):
         # pillar 충돌 방지  
         # 초록색 박스에서 속도 줄이기 
 
+        self.prevDisplacement = currentDisplacement
+
         return ret
 
     ################################################################################
