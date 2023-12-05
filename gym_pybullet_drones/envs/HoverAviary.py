@@ -102,6 +102,7 @@ class HoverAviary(BaseRLAviary):
 
         """
         state = self._getDroneStateVector(0)
+        roll, pitch = state[7:9]
         ret = 0 
 
         # displacement, energy, overspeed, arrival, accuracy 
@@ -138,9 +139,9 @@ class HoverAviary(BaseRLAviary):
 
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
-        if abs(x) > 3 or abs(y) > 3: 
+        if abs(currentPosition[0]) > 3 or abs(currentPosition[1]) > 3: 
             ret -= 100
-        elif z > 4: 
+        elif currentPosition[2] > 4: 
             ret -= 100 
 
         # minimize turbulence using rpys and quat and ang_v
