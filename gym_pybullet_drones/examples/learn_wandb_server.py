@@ -85,16 +85,17 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
                 tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                 verbose=1)
     # print(os.listdir('/root/models'))
-    print(os.listdir(checkpoint_dir))
-    if os.path.isfile(checkpoint_dir+'/hover_without_green.pkl'):
-        print("시작해보자222")
-        path = checkpoint_dir+'/hover_without_green.pkl'
-        model = SAC.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
-                verbose=1)
-        # model = model.load(path, print_system_info=True)
-        print("끝")
-    else: 
-        print("not found")
+    if checkpoint_dir is not None:
+        print(os.listdir(checkpoint_dir))
+        if os.path.isfile(checkpoint_dir+'/hover_without_green.pkl'):
+            print("시작해보자222")
+            path = checkpoint_dir+'/hover_without_green.pkl'
+            model = SAC.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
+                    verbose=1)
+            # model = model.load(path, print_system_info=True)
+            print("끝")
+        else: 
+            print("not found")
     # path = '/models/hover_without_green.pkl'
     # model = SAC.load(path, print_system_info=True)
 
@@ -160,7 +161,7 @@ if __name__ == '__main__':
     parser.add_argument('--output_folder',      default=DEFAULT_OUTPUT_FOLDER, type=str,           help='Folder where to save logs (default: "results")', metavar='')
     parser.add_argument('--colab',              default=DEFAULT_COLAB,         type=bool,          help='Whether example is being run by a notebook (default: "False")', metavar='')
     parser.add_argument('--wandb_key')
-    parser.add_argument('--checkpoint_dir')
+    parser.add_argument('--checkpoint_dir',      default=None)
     parser.add_argument('--steps',              default=DEFAULT_STEPS)
     ARGS = parser.parse_args()
 
