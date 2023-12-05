@@ -103,7 +103,7 @@ class HoverAviary(BaseRLAviary):
         #     ret = 1
         # else:
         #     ret = -1
-
+        
         if np.linalg.norm(self.TARGET_POS-state[0:3]) < 1:
             ret = max(0, 1 - np.linalg.norm(self.TARGET_POS-state[0:3]))
         else:
@@ -125,11 +125,15 @@ class HoverAviary(BaseRLAviary):
         import math
         state = self._getDroneStateVector(0)
         roll, pitch = state[7:9]
-        z = state[2]
+        x, y, z = state[:3]
 
-        if roll > math.pi/2 or roll < -math.pi/2 or pitch > math.pi/2 or pitch < -math.pi/2:
+        # if roll > math.pi/2 or roll < -math.pi/2 or pitch > math.pi/2 or pitch < -math.pi/2:
+        #     return True 
+        if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             return True 
-        elif z < 0.2: 
+        if abs(x) > 3 or abs(y) > 3: 
+            return True 
+        elif z < 0.2 or z > 4: 
             return True 
         else:
             return False    
