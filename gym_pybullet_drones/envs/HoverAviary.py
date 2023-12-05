@@ -57,19 +57,22 @@ class HoverAviary(BaseRLAviary):
         targetY = random.uniform(-2, 2)
         self.TARGET_POS = np.array([targetX,targetY,1])
         self.EPISODE_LEN_SEC = 8
-        self.prevDisplacement = np.linalg.norm(self.TARGET_POS - self.INIT_XYZS)
+
         super().__init__(drone_model=drone_model,
-                         num_drones=1,
-                         initial_xyzs=initial_xyzs,
-                         initial_rpys=initial_rpys,
-                         physics=physics,
-                         pyb_freq=pyb_freq,
-                         ctrl_freq=ctrl_freq,
-                         gui=gui,
-                         record=record,
-                         obs=obs,
-                         act=act
-                         )
+                        num_drones=1,
+                        initial_xyzs=initial_xyzs,
+                        initial_rpys=initial_rpys,
+                        physics=physics,
+                        pyb_freq=pyb_freq,
+                        ctrl_freq=ctrl_freq,
+                        gui=gui,
+                        record=record,
+                        obs=obs,
+                        act=act
+                        )
+
+        self.prevDisplacement = np.linalg.norm(self.TARGET_POS - self.INIT_XYZS)
+        
 
     ################################################################################
     
