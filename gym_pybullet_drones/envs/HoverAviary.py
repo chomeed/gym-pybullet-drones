@@ -105,7 +105,7 @@ class HoverAviary(BaseRLAviary):
         ret = 0 
 
         # displacement, energy, overspeed, arrival, accuracy 
-        weights = [1, 1, 1, 100, 1]
+        weights = [1, 2, 1, 100, 5]
 
         # displacement
         currentPosition = state[0:3] 
@@ -135,6 +135,13 @@ class HoverAviary(BaseRLAviary):
 
         check = [displacementDelta, energyCost, overspeed, int(self.isArrivedCount == 1), isArrived]
         ret = np.dot(weights, check)
+
+        if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
+            ret -= 100
+        if abs(x) > 3 or abs(y) > 3: 
+            ret -= 100
+        elif z > 4: 
+            ret -= 100 
 
         # minimize turbulence using rpys and quat and ang_v
 
@@ -169,7 +176,7 @@ class HoverAviary(BaseRLAviary):
             return True 
         if abs(x) > 3 or abs(y) > 3: 
             return True 
-        elif z < 0.2 or z > 4: 
+        elif z > 4: 
             return True 
         else:
             return False    

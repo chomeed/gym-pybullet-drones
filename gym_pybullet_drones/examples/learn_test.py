@@ -60,9 +60,9 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 train_env,
                 verbose=1)
        
-    if os.path.isfile(output_folder+'/hover_without_green.pkl'):
+    if os.path.isfile(output_folder+'/find_green_from_scratch.pkl'):
         print("시작해보자222")
-        path = output_folder+'/hover_without_green.pkl'
+        path = output_folder+'/find_green_from_scratch.pkl'
         model = SAC.load(path, print_system_info=True)
         # model = model.load(path, print_system_info=True)
         print("끝")
@@ -97,7 +97,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     obs, info = test_env_nogui.reset(seed=22, options={})
     start = time.time()
     totalReward = 0
-    for i in range((test_env_nogui.EPISODE_LEN_SEC+50)*test_env_nogui.CTRL_FREQ):
+    for i in range((test_env_nogui.EPISODE_LEN_SEC+500)*test_env_nogui.CTRL_FREQ):
         action, _states = model.predict(obs,
                                         deterministic=True
                                         )

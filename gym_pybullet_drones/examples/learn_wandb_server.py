@@ -87,9 +87,9 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
     # print(os.listdir('/root/models'))
     if checkpoint_dir is not None:
         print(os.listdir(checkpoint_dir))
-        if os.path.isfile(checkpoint_dir+'/hover_without_green.pkl'):
+        if os.path.isfile(checkpoint_dir+'/checkpoint.pkl'):
             print("시작해보자222")
-            path = checkpoint_dir+'/hover_without_green.pkl'
+            path = checkpoint_dir+'/checkpoint.pkl'
             model = SAC.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                     verbose=1)
             # model = model.load(path, print_system_info=True)
