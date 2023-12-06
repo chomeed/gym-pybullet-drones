@@ -104,6 +104,7 @@ class HoverAviary(BaseRLAviary):
         """
         state = self._getDroneStateVector(0)
         roll, pitch = state[7:9]
+        spinningSpeed = state[12]
         ret = 0 
 
         # displacement, energy, overspeed, arrival, accuracy 
