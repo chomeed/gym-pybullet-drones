@@ -144,7 +144,7 @@ class HoverAviary(BaseRLAviary):
             ret -= 100
         if abs(currentPosition[0]) > 3 or abs(currentPosition[1]) > 3: 
             ret -= 100
-        elif currentPosition[2] > 4:    
+        elif currentPosition[2] > 4 or currentPosition[2] < 0.2:    
             ret -= 100 
         elif currentDisplacement < 0.25:
         # elif currentDisplacement < 0.12:
@@ -193,7 +193,7 @@ class HoverAviary(BaseRLAviary):
             return True 
         elif abs(x) > 3 or abs(y) > 3: 
             return True 
-        elif z > 4: 
+        elif z > 4 or z < 0.2: 
             return True 
         else:
             return False    
