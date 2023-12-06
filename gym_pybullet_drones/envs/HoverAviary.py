@@ -107,7 +107,7 @@ class HoverAviary(BaseRLAviary):
         ret = 0 
 
         # displacement, energy, overspeed, arrival, accuracy 
-        weights = [2, 2, 1, 5, 1]
+        weights = [2, 0, 1, 5, 1]
 
         # displacement
         currentPosition = state[0:3] 
