@@ -28,7 +28,7 @@ import argparse
 import gymnasium as gym
 import numpy as np
 import torch
-from stable_baselines3 import SAC
+from stable_baselines3 import PPO, PPO 
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -78,7 +78,7 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
     print('[INFO] Observation space:', train_env.observation_space)
 
     #### Train the model #######################################
-    model = SAC('MultiInputPolicy',
+    model = PPO('MultiInputPolicy',
                 train_env,
                 # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
                 # tensorboard_log=filename+'/tb/',
@@ -90,14 +90,14 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
         if os.path.isfile(checkpoint_dir+'/checkpoint.pkl'):
             print("시작해보자222")
             path = checkpoint_dir+'/checkpoint.pkl'
-            model = SAC.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
+            model = PPO.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                     verbose=1)
             # model = model.load(path, print_system_info=True)
             print("끝")
         else: 
             print("not found")
     # path = '/models/hover_without_green.pkl'
-    # model = SAC.load(path, print_system_info=True)
+    # model = PPO.load(path, print_system_info=True)
 
     model.learn(total_timesteps=int(steps) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(
@@ -123,11 +123,11 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
 
     if os.path.isfile(output_folder+'/models/success_model.pkl'):
         path = output_folder+'/models/success_model.pkl'
-        model = SAC.load(path)
+        model = PPO.load(path)
         print(path, " loaded successfully.")
     elif os.path.isfile(filename+'/best_model.pkl'):
         path = filename+'/best_model.pkl'
-        model = SAC.load(path)
+        model = PPO.load(path)
     else:
         print("[ERROR]: no model under the specified path", filename) 
     
