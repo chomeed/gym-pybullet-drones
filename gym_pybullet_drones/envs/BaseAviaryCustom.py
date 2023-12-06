@@ -523,7 +523,7 @@ class BaseAviary(gym.Env):
                                               physicsClientId=self.CLIENT
                                               ) for i in range(self.NUM_DRONES)])
 
-        randomTorque = random.uniform(-0.05, 0.05)
+        randomTorque = random.uniform(-0.02, 0.02)
         p.applyExternalTorque(self.DRONE_IDS[0],
                               4,
                               torqueObj=[0, 0, randomTorque],

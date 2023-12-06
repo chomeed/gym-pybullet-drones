@@ -52,10 +52,11 @@ class HoverAviary(BaseRLAviary):
             The type of action space (1 or 3D; RPMS, thurst and torques, or waypoint with PID control)
 
         """
-        
+
         targetX, targetY = generate_random_position()
-        self.TARGET_POS = np.array([targetX,targetY,1])
-        # self.TARGET_POS = np.array([1, 0, 1])
+        targetY = random.uniform(-1, 1) 
+        # self.TARGET_POS = np.array([targetX,targetY,1])
+        self.TARGET_POS = np.array([1, targetY, 1])
         self.EPISODE_LEN_SEC = 20
 
         super().__init__(drone_model=drone_model,
@@ -276,7 +277,10 @@ class HoverAviary(BaseRLAviary):
 
         targetX, targetY = generate_random_position()
 
-        self.TARGET_POS = np.array([targetX,targetY,1])
+        # self.TARGET_POS = np.array([targetX,targetY,1])
+        targetY = random.uniform(-1, 1) 
+        # self.TARGET_POS = np.array([targetX,targetY,1])
+        self.TARGET_POS = np.array([1, targetY, 1])
         return initial_obs, initial_info
 
 def generate_random_position():
