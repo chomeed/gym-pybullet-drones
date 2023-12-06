@@ -531,13 +531,13 @@ class BaseAviary(gym.Env):
                               physicsClientId=self.CLIENT
                               )
 
-        p.applyExternalForce(self.DRONE_IDS[0],
-                                 4,
-                                 forceObj=[2, 0, 0],
-                                 posObj=[0, 0, 0],
-                                 flags=p.LINK_FRAME,
-                                 physicsClientId=self.CLIENT
-                                 )
+        # p.applyExternalForce(self.DRONE_IDS[0],
+        #                          4,
+        #                          forceObj=[2, 0, 0],
+        #                          posObj=[0, 0, 0],
+        #                          flags=p.LINK_FRAME,
+        #                          physicsClientId=self.CLIENT
+        #                          )
 
         #### Remove default damping #################################
         # for i in range(self.NUM_DRONES):

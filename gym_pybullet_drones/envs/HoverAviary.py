@@ -52,11 +52,10 @@ class HoverAviary(BaseRLAviary):
             The type of action space (1 or 3D; RPMS, thurst and torques, or waypoint with PID control)
 
         """
-
-        targetX = random.uniform(-2, 2)
-        targetY = random.uniform(-2, 2)
-        # self.TARGET_POS = np.array([targetX,targetY,1])
-        self.TARGET_POS = np.array([1, 0, 1])
+        
+        targetX, targetY = generate_random_position()
+        self.TARGET_POS = np.array([targetX,targetY,1])
+        # self.TARGET_POS = np.array([1, 0, 1])
         self.EPISODE_LEN_SEC = 20
 
         super().__init__(drone_model=drone_model,
@@ -274,22 +273,20 @@ class HoverAviary(BaseRLAviary):
         #### Return the initial observation ########################
         initial_obs = self._computeObs()
         initial_info = self._computeInfo()
-        targetX = random.uniform(1, 2)
-        targetY = random.uniform(-1, 1)
 
+        targetX, targetY = generate_random_position()
 
-        def generate_random_position():
-            # Generate a random angle in radians
-            theta = random.uniform(0, 2 * np.pi)
-
-            # Generate a random radius within the specified circle's radius
-
-            # Convert polar coordinates to Cartesian coordinates
-            x = 0.5 * np.cos(theta)
-            y = 0.5 * np.sin(theta)
-
-            return x, y
-        # targetX, targetY = generate_random_position()
-
-        # self.TARGET_POS = np.array([targetX,targetY,1])
+        self.TARGET_POS = np.array([targetX,targetY,1])
         return initial_obs, initial_info
+
+def generate_random_position():
+    # Generate a random angle in radians
+    theta = random.uniform(0, 2 * np.pi)
+
+    # Generate a random radius within the specified circle's radius
+
+    # Convert polar coordinates to Cartesian coordinates
+    x = 1 * np.cos(theta)
+    y = 1 * np.sin(theta)
+
+    return x, y
