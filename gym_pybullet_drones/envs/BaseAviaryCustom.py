@@ -150,7 +150,9 @@ class BaseAviary(gym.Env):
             self.CLIENT = p.connect(p.GUI) # p.connect(p.GUI, options="--opengl2")
             # p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0, physicsClientId=self.CLIENT)
             for i in [p.COV_ENABLE_RGB_BUFFER_PREVIEW, p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW]:
-                p.configureDebugVisualizer(i, 1, physicsClientId=self.CLIENT)
+                p.configureDebugVisualizer(i, 0, physicsClientId=self.CLIENT)
+            p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 1, physicsClientId=self.CLIENT)
+            
 
             
         else:
@@ -506,9 +508,9 @@ class BaseAviary(gym.Env):
             # Convert angles to radians
             rolls_rad = np.radians(rolls)
             pitches_rad = np.radians(pitches)
-            yaws_rad = np.radians(yaws)
+            # yaws_rad = np.radians(yaws)
 
-            return np.array([rolls_rad, pitches_rad, yaws_rad]).transpose()
+            return np.array([rolls_rad, pitches_rad, yaws]).transpose()
 
         self.INIT_RPYS = generate_random_rpy()
         ##
@@ -519,6 +521,14 @@ class BaseAviary(gym.Env):
                                               flags = p.URDF_USE_INERTIA_FROM_FILE,
                                               physicsClientId=self.CLIENT
                                               ) for i in range(self.NUM_DRONES)])
+
+        randomTorque = random.uniform(-0.05, 0.05)
+        p.applyExternalTorque(self.DRONE_IDS[0],
+                              4,
+                              torqueObj=[0, 0, randomTorque],
+                              flags=p.LINK_FRAME,
+                              physicsClientId=self.CLIENT
+                              )
         #### Remove default damping #################################
         # for i in range(self.NUM_DRONES):
         #     p.changeDynamics(self.DRONE_IDS[i], -1, linearDamping=0, angularDamping=0)
