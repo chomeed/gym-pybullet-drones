@@ -56,7 +56,7 @@ class HoverAviary(BaseRLAviary):
         targetX = random.uniform(-2, 2)
         targetY = random.uniform(-2, 2)
         self.TARGET_POS = np.array([targetX,targetY,1])
-        self.EPISODE_LEN_SEC = 40
+        self.EPISODE_LEN_SEC = 10
 
         super().__init__(drone_model=drone_model,
                         num_drones=1,
@@ -106,7 +106,7 @@ class HoverAviary(BaseRLAviary):
         ret = 0 
 
         # displacement, energy, overspeed, arrival, accuracy 
-        weights = [1, 2, 1, 5, 1]
+        weights = [2, 2, 1, 5, 1]
 
         # displacement
         currentPosition = state[0:3] 
@@ -275,6 +275,21 @@ class HoverAviary(BaseRLAviary):
         initial_info = self._computeInfo()
         targetX = random.uniform(1, 2)
         targetY = random.uniform(-1, 1)
+
+
+        def generate_random_position():
+            # Generate a random angle in radians
+            theta = random.uniform(0, 2 * np.pi)
+
+            # Generate a random radius within the specified circle's radius
+
+            # Convert polar coordinates to Cartesian coordinates
+            x = 0.75 * np.cos(theta)
+            y = 0.75 * np.sin(theta)
+
+            return x, y
+        targetX, targetY = generate_random_position()
+
         self.TARGET_POS = np.array([targetX,targetY,1])
         
         return initial_obs, initial_info
