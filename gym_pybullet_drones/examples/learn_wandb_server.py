@@ -88,16 +88,12 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
     if checkpoint_dir is not None:
         print(os.listdir(checkpoint_dir))
         if os.path.isfile(checkpoint_dir+'/checkpoint.pkl'):
-            print("시작해보자222")
             path = checkpoint_dir+'/checkpoint.pkl'
             model = PPO.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                     verbose=1)
-            # model = model.load(path, print_system_info=True)
-            print("끝")
+            print("Checkpoint loaded")
         else: 
             print("not found")
-    # path = '/models/hover_without_green.pkl'
-    # model = PPO.load(path, print_system_info=True)
 
     model.learn(total_timesteps=int(steps) if local else 6*int(1e3), # shorter training in GitHub Actions pytest
                 callback=WandbCallback(

@@ -22,7 +22,7 @@ import argparse
 import gymnasium as gym
 import numpy as np
 import torch
-from stable_baselines3 import SAC
+from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -56,20 +56,15 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     print('[INFO] Observation space:', train_env.observation_space)
 
     #### Train the model #######################################
-    model = SAC('MultiInputPolicy',
+    model = PPO('MultiInputPolicy',
                 train_env,
                 verbose=1)
        
-    if os.path.isfile(output_folder+'/R05.pkl'):
-        print("시작해보자222")
-        path = output_folder+'/R05.pkl'
-        model = SAC.load(path, print_system_info=True)
-        # model = model.load(path, print_system_info=True)
-        print("끝")
-    elif os.path.isfile(output_folder+'/model.zip'):
-        path = output_folder+'/model.zip'
-        model = SAC.load(path, print_system_info=True)
-
+    if os.path.isfile(output_folder+'/easy_task/v0.pkl'):
+        print("CHECKPOINT FILE FOUND")
+        path = output_folder+'/easy_task/v0.pkl'
+        model = PPO.load(path, print_system_info=True)
+        print("CHECKPOINT LOADED SUCCESFULLY")
     else:   
         print("[ERROR]: no model under the specified path", filename)
     
