@@ -2,7 +2,7 @@ import numpy as np
 import pybullet as p
 import pkg_resources
 
-from gym_pybullet_drones.envs.BaseRLAviary import BaseRLAviary
+from gym_pybullet_drones.envs.BaseRLAviaryEnv2 import BaseRLAviary
 from gym_pybullet_drones.utils.enums import DroneModel, Physics, ActionType, ObservationType
 
 import random
@@ -53,15 +53,15 @@ class HoverAviary(BaseRLAviary):
 
         """
 
-        targetX, targetY = generate_random_position()
-        # targetY = random.uniform(-1, 1) 
-        self.TARGET_POS = np.array([targetX,targetY,0.25])
-        # self.TARGET_POS = np.array([1, targetY, 1])
+        # targetX, targetY = generate_random_position()
+        targetY = random.uniform(-1, 1) 
+        # self.TARGET_POS = np.array([targetX,targetY,0.25])
+        self.TARGET_POS = np.array([1, targetY, 1])
         self.EPISODE_LEN_SEC = 10
 
         super().__init__(drone_model=drone_model,
                         num_drones=1,
-                        initial_xyzs=initial_xyzs,
+                        initial_xyzs=np.array([[0, 0, 1]]),
                         initial_rpys=initial_rpys,
                         physics=physics,
                         pyb_freq=pyb_freq,
@@ -86,7 +86,7 @@ class HoverAviary(BaseRLAviary):
         Overrides BaseAviary's method.
 
         """
-        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere.urdf'), self.TARGET_POS,
+        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere_env2.urdf'), self.TARGET_POS,
                                                     p.getQuaternionFromEuler([0,0,0]),
                                                     useFixedBase=True,   # Doesn't move
                                                     #flags = p.URDF_USE_INERTIA_FROM_FILE,
@@ -146,9 +146,9 @@ class HoverAviary(BaseRLAviary):
         # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
-        if abs(currentPosition[0]) > 0.75 or abs(currentPosition[1]) > 0.75: 
+        if abs(currentPosition[0]) > 3 or abs(currentPosition[1]) > 3: 
             ret -= 100
-        elif currentPosition[2] > 2.2 or currentPosition[2] < 0.05:    
+        elif currentPosition[2] > 4 or currentPosition[2] < 0.05:    
             ret -= 100 
         elif currentDisplacement < 0.25:
         # elif currentDisplacement < 0.12:
@@ -192,13 +192,13 @@ class HoverAviary(BaseRLAviary):
         # if roll > math.pi/2 or roll < -math.pi/2 or pitch > math.pi/2 or pitch < -math.pi/2:
         #     return True 
         # if currentDisplacement < 0.12:
-        if currentDisplacement < 0.2:
+        if currentDisplacement < 0.25:
             return True
         elif abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             return True 
-        elif abs(x) > 0.75 or abs(y) > 0.75: 
+        elif abs(x) > 3 or abs(y) > 3: 
             return True 
-        elif z > 3 or z < 0.05: 
+        elif z > 4 or z < 0.05: 
             return True 
         else:
             return False    
@@ -280,12 +280,12 @@ class HoverAviary(BaseRLAviary):
         initial_obs = self._computeObs()
         initial_info = self._computeInfo()
 
-        targetX, targetY = generate_random_position()
+        # targetX, targetY = generate_random_position()
 
         # self.TARGET_POS = np.array([targetX,targetY,1])
-        # targetY = random.uniform(-1, 1) 
-        self.TARGET_POS = np.array([targetX,targetY,0.25])
-        # self.TARGET_POS = np.array([1, targetY, 1])
+        targetY = random.uniform(-1, 1) 
+        # self.TARGET_POS = np.array([targetX,targetY,0.25])
+        self.TARGET_POS = np.array([1, targetY, 1])
         return initial_obs, initial_info
 
 def generate_random_position():

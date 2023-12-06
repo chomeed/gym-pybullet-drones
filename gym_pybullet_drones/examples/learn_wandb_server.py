@@ -1,6 +1,6 @@
 """Script demonstrating the use of `gym_pybullet_drones`'s Gymnasium interface.
 
-Classes HoverAviary and MultiHoverAviary are used as learning envs for the PPO algorithm.
+Classes HoverAviary and MultiHoverAviary are used as learning envs for the SAC algorithm.
 
 Example
 -------
@@ -28,7 +28,7 @@ import argparse
 import gymnasium as gym
 import numpy as np
 import torch
-from stable_baselines3 import PPO
+from stable_baselines3 import SAC
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -65,7 +65,7 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
     if not multiagent:
         train_env = make_vec_env(HoverAviary,
                                  env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=1,
+                                 n_envs=25,
                                  seed=0
                                  )
         eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
@@ -78,7 +78,7 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
     print('[INFO] Observation space:', train_env.observation_space)
 
     #### Train the model #######################################
-    model = PPO('MultiInputPolicy',
+    model = SAC('MultiInputPolicy',
                 train_env,
                 # policy_kwargs=dict(activation_fn=torch.nn.ReLU, net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]),
                 # tensorboard_log=filename+'/tb/',
@@ -89,7 +89,7 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
         print(os.listdir(checkpoint_dir))
         if os.path.isfile(checkpoint_dir+'/checkpoint.pkl'):
             path = checkpoint_dir+'/checkpoint.pkl'
-            model = PPO.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
+            model = SAC.load(path, env=train_env, print_system_info=True, tensorboard_log=output_folder + f"/runs/{wb_run.id}",
                     verbose=1)
             print("Checkpoint loaded")
         else: 
@@ -101,7 +101,7 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
                     model_save_path=output_folder + f"/models/{wb_run.id}",
                     verbose=2
                 ),
-                log_interval=5)
+                log_interval=50)
 
     #### Save the model ########################################
     model.save(output_folder+'/models/success_model.pkl')
@@ -119,11 +119,11 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
 
     if os.path.isfile(output_folder+'/models/success_model.pkl'):
         path = output_folder+'/models/success_model.pkl'
-        model = PPO.load(path)
+        model = SAC.load(path)
         print(path, " loaded successfully.")
     elif os.path.isfile(filename+'/best_model.pkl'):
         path = filename+'/best_model.pkl'
-        model = PPO.load(path)
+        model = SAC.load(path)
     else:
         print("[ERROR]: no model under the specified path", filename) 
     
