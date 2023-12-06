@@ -60,9 +60,9 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 train_env,
                 verbose=1)
        
-    if os.path.isfile(output_folder+'/find_green_from_scratch.pkl'):
+    if os.path.isfile(output_folder+'/v2_find_green_from_scratch.pkl'):
         print("시작해보자222")
-        path = output_folder+'/find_green_from_scratch.pkl'
+        path = output_folder+'/v2_find_green_from_scratch.pkl'
         model = SAC.load(path, print_system_info=True)
         # model = model.load(path, print_system_info=True)
         print("끝")

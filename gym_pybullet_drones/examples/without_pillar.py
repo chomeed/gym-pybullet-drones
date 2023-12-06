@@ -46,17 +46,21 @@ def run(gui=DEFAULT_GUI, plot=False, ):
 
     obs, info = test_env.reset(seed=22, options={})
     start = time.time()
+    totalReward = 0
     for i in range((test_env.EPISODE_LEN_SEC+50)*test_env.CTRL_FREQ):
         action, _states = model.predict(obs,
                                         deterministic=True
                                         )
         action = action.squeeze(0)
         obs, reward, terminated, truncated, info = test_env.step(action)
+        totalReward += reward 
         act2 = action.squeeze()
 
         sync(i, start, test_env.CTRL_TIMESTEP)
         
         if terminated or truncated:
+            print(totalReward)
+            totalReward = 0
             obs, info = test_env.reset(seed=22, options={})
     test_env.close()
 

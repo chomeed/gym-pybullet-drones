@@ -85,7 +85,7 @@ class HoverAviary(BaseRLAviary):
         Overrides BaseAviary's method.
 
         """
-        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position.urdf'), self.TARGET_POS,
+        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere.urdf'), self.TARGET_POS,
                                                     p.getQuaternionFromEuler([0,0,0]),
                                                     useFixedBase=True,   # Doesn't move
                                                     #flags = p.URDF_USE_INERTIA_FROM_FILE,
@@ -127,14 +127,15 @@ class HoverAviary(BaseRLAviary):
             overspeed = 0
         
         # arrival, accuracy -- within the goal 
-        if currentDisplacement < 0.25:
-            # arrival 
-            self.isArrivedCount += 1
-            isArrived = 1 - currentDisplacement*4
-        else: 
-            isArrived = 0
+        # if currentDisplacement < 0.25:
+        #     # arrival 
+        #     self.isArrivedCount += 1
+        #     isArrived = 1 - currentDisplacement*4
+        # else: 
+        #     isArrived = 0
 
-        check = [displacementDelta, energyCost, overspeed, int(self.isArrivedCount == 1), isArrived]
+        # check = [displacementDelta, energyCost, overspeed, int(self.isArrivedCount == 1), isArrived]
+        check = [displacementDelta, energyCost, overspeed, 0, 0]
         ret = np.dot(weights, check)
 
         # termination condition
@@ -144,7 +145,8 @@ class HoverAviary(BaseRLAviary):
             ret -= 100
         elif currentPosition[2] > 4: 
             ret -= 100 
-        elif currentDisplacement < 0.12:
+        elif currentDisplacement < 0.25:
+        # elif currentDisplacement < 0.12:
             ret += 100
         elif self.step_counter/self.PYB_FREQ > self.EPISODE_LEN_SEC:
             ret -= 100
@@ -183,7 +185,8 @@ class HoverAviary(BaseRLAviary):
 
         # if roll > math.pi/2 or roll < -math.pi/2 or pitch > math.pi/2 or pitch < -math.pi/2:
         #     return True 
-        if currentDisplacement < 0.12:
+        # if currentDisplacement < 0.12:
+        if currentDisplacement < 0.25:
             return True
         elif abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             return True 
