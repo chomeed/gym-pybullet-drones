@@ -55,7 +55,8 @@ class HoverAviary(BaseRLAviary):
 
         targetX = random.uniform(-2, 2)
         targetY = random.uniform(-2, 2)
-        self.TARGET_POS = np.array([targetX,targetY,1])
+        # self.TARGET_POS = np.array([targetX,targetY,1])
+        self.TARGET_POS = np.array([1, 0, 1])
         self.EPISODE_LEN_SEC = 10
 
         super().__init__(drone_model=drone_model,
@@ -143,7 +144,7 @@ class HoverAviary(BaseRLAviary):
             ret -= 100
         if abs(currentPosition[0]) > 3 or abs(currentPosition[1]) > 3: 
             ret -= 100
-        elif currentPosition[2] > 4: 
+        elif currentPosition[2] > 4:    
             ret -= 100 
         elif currentDisplacement < 0.25:
         # elif currentDisplacement < 0.12:
@@ -288,8 +289,7 @@ class HoverAviary(BaseRLAviary):
             y = 0.5 * np.sin(theta)
 
             return x, y
-        targetX, targetY = generate_random_position()
+        # targetX, targetY = generate_random_position()
 
-        self.TARGET_POS = np.array([targetX,targetY,1])
-        
+        # self.TARGET_POS = np.array([targetX,targetY,1])
         return initial_obs, initial_info

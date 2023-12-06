@@ -148,9 +148,9 @@ class BaseAviary(gym.Env):
         if self.GUI:
             #### With debug GUI ########################################
             self.CLIENT = p.connect(p.GUI) # p.connect(p.GUI, options="--opengl2")
-            p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0, physicsClientId=self.CLIENT)
+            # p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0, physicsClientId=self.CLIENT)
             for i in [p.COV_ENABLE_RGB_BUFFER_PREVIEW, p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW]:
-                p.configureDebugVisualizer(i, 0, physicsClientId=self.CLIENT)
+                p.configureDebugVisualizer(i, 1, physicsClientId=self.CLIENT)
             # p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 1, physicsClientId=self.CLIENT)
             
 
@@ -503,7 +503,8 @@ class BaseAviary(gym.Env):
         def generate_random_rpy(max_roll_pitch=10):
             rolls = [random.uniform(-max_roll_pitch, max_roll_pitch) for _ in range(self.NUM_DRONES)]
             pitches = [random.uniform(-max_roll_pitch, max_roll_pitch) for _ in range(self.NUM_DRONES)]
-            yaws = [random.uniform(-np.pi, np.pi) for _ in range(self.NUM_DRONES)]
+            # yaws = [random.uniform(-np.pi, np.pi) for _ in range(self.NUM_DRONES)]
+            yaws = [0 for _ in range(self.NUM_DRONES)]
 
             # Convert angles to radians
             rolls_rad = np.radians(rolls)
