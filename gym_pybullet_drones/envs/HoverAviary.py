@@ -56,7 +56,7 @@ class HoverAviary(BaseRLAviary):
         targetX = random.uniform(-2, 2)
         targetY = random.uniform(-2, 2)
         self.TARGET_POS = np.array([targetX,targetY,1])
-        self.EPISODE_LEN_SEC = 500
+        self.EPISODE_LEN_SEC = 40
 
         super().__init__(drone_model=drone_model,
                         num_drones=1,
@@ -137,6 +137,7 @@ class HoverAviary(BaseRLAviary):
         check = [displacementDelta, energyCost, overspeed, int(self.isArrivedCount == 1), isArrived]
         ret = np.dot(weights, check)
 
+        # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
         if abs(currentPosition[0]) > 3 or abs(currentPosition[1]) > 3: 
@@ -145,6 +146,10 @@ class HoverAviary(BaseRLAviary):
             ret -= 100 
         elif currentDisplacement < 0.12:
             ret += 100
+        elif self.step_counter/self.PYB_FREQ > self.EPISODE_LEN_SEC:
+            ret -= 100
+
+        
 
         # minimize turbulence using rpys and quat and ang_v
 
