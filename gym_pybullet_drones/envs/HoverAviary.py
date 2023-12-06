@@ -284,8 +284,8 @@ class HoverAviary(BaseRLAviary):
             # Generate a random radius within the specified circle's radius
 
             # Convert polar coordinates to Cartesian coordinates
-            x = 0.75 * np.cos(theta)
-            y = 0.75 * np.sin(theta)
+            x = 0.5 * np.cos(theta)
+            y = 0.5 * np.sin(theta)
 
             return x, y
         targetX, targetY = generate_random_position()
