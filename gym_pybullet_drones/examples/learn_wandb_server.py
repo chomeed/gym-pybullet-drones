@@ -65,7 +65,7 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
     if not multiagent:
         train_env = make_vec_env(HoverAviary,
                                  env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=25,
+                                 n_envs=5,
                                  seed=0
                                  )
         eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
@@ -105,7 +105,7 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
                     model_save_path=output_folder + f"/models/{wb_run.id}",
                     verbose=2
                 ),
-                log_interval=25)
+                log_interval=5)
 
     #### Save the model ########################################
     model.save(output_folder+'/models/success_model.pkl')
@@ -168,7 +168,7 @@ if __name__ == '__main__':
     wandb.login(key=ARGS.wandb_key)
 
     wb_run = wandb.init(
-        project="sb3",
+        project="sb3_v2",
         sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
         save_code=True,  # optional
     )
