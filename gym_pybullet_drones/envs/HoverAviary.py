@@ -139,6 +139,9 @@ class HoverAviary(BaseRLAviary):
         check = [displacementDelta, energyCost, overspeed, 0, 0]
         ret = np.dot(weights, check)
 
+        if abs(spinningSpeed) > 10:
+            ret -= 5
+
         # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
@@ -180,6 +183,7 @@ class HoverAviary(BaseRLAviary):
         state = self._getDroneStateVector(0)
         roll, pitch = state[7:9]
         x, y, z = state[:3]
+        
 
         currentPosition = state[0:3] 
         currentDisplacement = np.linalg.norm(self.TARGET_POS - currentPosition)
