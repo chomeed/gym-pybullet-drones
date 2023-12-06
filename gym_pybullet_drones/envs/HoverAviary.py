@@ -54,10 +54,10 @@ class HoverAviary(BaseRLAviary):
         """
 
         targetX, targetY = generate_random_position()
-        targetY = random.uniform(-1, 1) 
-        # self.TARGET_POS = np.array([targetX,targetY,1])
-        self.TARGET_POS = np.array([1, targetY, 1])
-        self.EPISODE_LEN_SEC = 20
+        # targetY = random.uniform(-1, 1) 
+        self.TARGET_POS = np.array([targetX,targetY,0.25])
+        # self.TARGET_POS = np.array([1, targetY, 1])
+        self.EPISODE_LEN_SEC = 7
 
         super().__init__(drone_model=drone_model,
                         num_drones=1,
@@ -146,9 +146,9 @@ class HoverAviary(BaseRLAviary):
         # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
-        if abs(currentPosition[0]) > 3 or abs(currentPosition[1]) > 3: 
+        if abs(currentPosition[0]) > 0.75 or abs(currentPosition[1]) > 0.75: 
             ret -= 100
-        elif currentPosition[2] > 4 or currentPosition[2] < 0.2:    
+        elif currentPosition[2] > 2.2 or currentPosition[2] < 0.05:    
             ret -= 100 
         elif currentDisplacement < 0.25:
         # elif currentDisplacement < 0.12:
@@ -196,9 +196,9 @@ class HoverAviary(BaseRLAviary):
             return True
         elif abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             return True 
-        elif abs(x) > 3 or abs(y) > 3: 
+        elif abs(x) > 0.75 or abs(y) > 0.75: 
             return True 
-        elif z > 4 or z < 0.2: 
+        elif z > 3 or z < 0.05: 
             return True 
         else:
             return False    
@@ -283,9 +283,9 @@ class HoverAviary(BaseRLAviary):
         targetX, targetY = generate_random_position()
 
         # self.TARGET_POS = np.array([targetX,targetY,1])
-        targetY = random.uniform(-1, 1) 
-        # self.TARGET_POS = np.array([targetX,targetY,1])
-        self.TARGET_POS = np.array([1, targetY, 1])
+        # targetY = random.uniform(-1, 1) 
+        self.TARGET_POS = np.array([targetX,targetY,0.25])
+        # self.TARGET_POS = np.array([1, targetY, 1])
         return initial_obs, initial_info
 
 def generate_random_position():
@@ -295,7 +295,7 @@ def generate_random_position():
     # Generate a random radius within the specified circle's radius
 
     # Convert polar coordinates to Cartesian coordinates
-    x = 1 * np.cos(theta)
-    y = 1 * np.sin(theta)
+    x = 0.5 * np.cos(theta)
+    y = 0.5 * np.sin(theta)
 
     return x, y

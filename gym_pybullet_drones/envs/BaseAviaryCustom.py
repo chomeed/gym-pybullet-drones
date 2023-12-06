@@ -148,7 +148,7 @@ class BaseAviary(gym.Env):
         if self.GUI:
             #### With debug GUI ########################################
             self.CLIENT = p.connect(p.GUI) # p.connect(p.GUI, options="--opengl2")
-            p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0, physicsClientId=self.CLIENT)
+            # p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0, physicsClientId=self.CLIENT)
             for i in [p.COV_ENABLE_RGB_BUFFER_PREVIEW, p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW]:
                 p.configureDebugVisualizer(i, 1, physicsClientId=self.CLIENT)
             # p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 1, physicsClientId=self.CLIENT)
@@ -204,7 +204,7 @@ class BaseAviary(gym.Env):
         if initial_xyzs is None:
             self.INIT_XYZS = np.vstack([np.array([x*4*self.L for x in range(self.NUM_DRONES)]), \
                                         np.array([y*4*self.L for y in range(self.NUM_DRONES)]), \
-                                        np.ones(self.NUM_DRONES)]).transpose().reshape(self.NUM_DRONES, 3)
+                                        np.ones(self.NUM_DRONES)*0.25]).transpose().reshape(self.NUM_DRONES, 3)
                                         # np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)]).transpose().reshape(self.NUM_DRONES, 3)
         elif np.array(initial_xyzs).shape == (self.NUM_DRONES,3):
             self.INIT_XYZS = initial_xyzs

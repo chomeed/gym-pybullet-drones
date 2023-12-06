@@ -282,7 +282,7 @@ class BaseRLAviary(BaseAviary):
         elif self.OBS_TYPE == ObservationType.RGBKIN:
             obs_rgb = spaces.Box(low=0,
                               high=255,
-                              shape=(self.IMG_RES[1], self.IMG_RES[0], 1), dtype=np.uint8)
+                              shape=(self.IMG_RES[1], self.IMG_RES[0], 4), dtype=np.uint8)
 
             lo = -np.inf
             hi = np.inf
@@ -358,8 +358,8 @@ class BaseRLAviary(BaseAviary):
                 except: 
                     print("error occured!")
 
-            rgb_res = np.array([self.dep[i] for i in range(self.NUM_DRONES)]).astype('uint8')
-            rgb_res = np.expand_dims(rgb_res, axis=3)
+            rgb_res = np.array([self.rgb[i] for i in range(self.NUM_DRONES)]).astype('uint8')
+            # rgb_res = np.expand_dims(rgb_res, axis=3)
          
             return {'obs_rgb': rgb_res,
                     'obs_kin': ret}
