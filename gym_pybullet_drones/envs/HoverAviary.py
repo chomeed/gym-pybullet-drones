@@ -117,7 +117,7 @@ class HoverAviary(BaseRLAviary):
         ret = 0 
 
         # displacement, energy, overspeed, arrival, accuracy 
-        weights = [5, 0, 0, 0, 0]
+        weights = [30, 0, 0, 0, 0]
 
         # displacement
         currentPosition = state[0:3] 
@@ -156,7 +156,7 @@ class HoverAviary(BaseRLAviary):
             ret -= 100
         elif currentPosition[2] > 5:    
             ret -= 100 
-        elif currentDisplacement < 0.05:
+        elif currentDisplacement < 0.15:
         # elif currentDisplacement < 0.12:
             ret += 100
         elif self.step_counter/self.PYB_FREQ > self.EPISODE_LEN_SEC:
@@ -202,7 +202,7 @@ class HoverAviary(BaseRLAviary):
         # if roll > math.pi/2 or roll < -math.pi/2 or pitch > math.pi/2 or pitch < -math.pi/2:
         #     return True 
         # if currentDisplacement < 0.12:
-        if currentDisplacement < 0.05:
+        if currentDisplacement < 0.15:
             return True
         elif abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             return True 
