@@ -9,8 +9,8 @@
       <geometry>
         <sphere radius="0.05"/>
       </geometry>
-      <material name="Green"> <!-- set color-->
-        <color rgba="0 1 0 0.2"/>
+      <material name="Red"> <!-- set color-->
+        <color rgba="1 0 0 0.5"/>
       </material>
     </visual>
   </link>

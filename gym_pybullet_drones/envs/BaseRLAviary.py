@@ -258,12 +258,15 @@ class BaseRLAviary(BaseAviary):
                             #   shape=(self.NUM_DRONES, 4, self.IMG_RES[1], self.IMG_RES[0]), dtype=np.uint8)
         elif self.OBS_TYPE == ObservationType.KIN:
             ############################################################
-            #### OBS SPACE OF SIZE 12 
+            #### OBS SPACE OF SIZE 12(w/o quat) + 3 target + past 10x4 rpms => 55
             #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ + 과거 RPM 값 
             lo = -np.inf
             hi = np.inf
-            obs_lower_bound = np.array([[lo,lo,0, lo,lo,lo,lo,lo,lo,lo,lo,lo] for i in range(self.NUM_DRONES)])
-            obs_upper_bound = np.array([[hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi] for i in range(self.NUM_DRONES)])
+            obs_lower_bound = np.array([[lo,lo,0, lo,lo,lo,lo,lo,lo,lo,lo,lo,lo,lo,lo] for i in range(self.NUM_DRONES)])
+            obs_upper_bound = np.array([[hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi] for i in range(self.NUM_DRONES)])
+            # obs_lower_bound = np.array([[lo,lo,0, lo,lo,lo,lo,lo,lo,lo,lo,lo] for i in range(self.NUM_DRONES)])
+            # obs_upper_bound = np.array([[hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi] for i in range(self.NUM_DRONES)])
+            
             #### Add action buffer to observation space ################
             act_lo = -1
             act_hi = +1
@@ -280,14 +283,17 @@ class BaseRLAviary(BaseAviary):
             return spaces.Box(low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32)
             ############################################################
         elif self.OBS_TYPE == ObservationType.RGBKIN:
+            #OBS SPACE OF SIZE 12(w/o quat) + 3 target + past 10x4 rpms => 55
             obs_rgb = spaces.Box(low=0,
                               high=255,
                               shape=(self.IMG_RES[1], self.IMG_RES[0], 4), dtype=np.uint8)
 
             lo = -np.inf
             hi = np.inf
-            obs_lower_bound = np.array([[lo,lo,0, lo,lo,lo,lo,lo,lo,lo,lo,lo] for i in range(self.NUM_DRONES)])
-            obs_upper_bound = np.array([[hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi] for i in range(self.NUM_DRONES)])
+            obs_lower_bound = np.array([[lo,lo,0, lo,lo,lo,lo,lo,lo,lo,lo,lo,lo,lo,lo] for i in range(self.NUM_DRONES)])
+            obs_upper_bound = np.array([[hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi] for i in range(self.NUM_DRONES)])
+            # obs_lower_bound = np.array([[lo,lo,0, lo,lo,lo,lo,lo,lo,lo,lo,lo] for i in range(self.NUM_DRONES)])
+            # obs_upper_bound = np.array([[hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi,hi] for i in range(self.NUM_DRONES)])
             #### Add action buffer to observation space ################
             act_lo = -1
             act_hi = +1
@@ -351,16 +357,17 @@ class BaseRLAviary(BaseAviary):
                 obs = self._getDroneStateVector(i)
                 obs_12[i, :] = np.hstack([obs[0:3], obs[7:10], obs[10:13], obs[13:16]]).reshape(12,)
             ret = np.array([obs_12[i, :] for i in range(self.NUM_DRONES)]).astype('float32')
+            ret = np.hstack([ret, np.repeat(self.target, self.NUM_DRONES, axis=0)])
             #### Add action buffer to observation #######################
             for i in range(self.ACTION_BUFFER_SIZE):
                 try: 
                     ret = np.hstack([ret, np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)])])
                 except: 
                     print("error occured!")
-
+            
             rgb_res = np.array([self.rgb[i] for i in range(self.NUM_DRONES)]).astype('uint8')
             # rgb_res = np.expand_dims(rgb_res, axis=3)
-         
+            print(ret)
             return {'obs_rgb': rgb_res,
                     'obs_kin': ret}
 

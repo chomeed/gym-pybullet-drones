@@ -486,6 +486,10 @@ class BaseAviary(gym.Env):
         self.rpy = np.zeros((self.NUM_DRONES, 3))
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
+
+        self.target = np.random.uniform(-2.5, 2.5, size=(1, 2))
+        self.target = np.hstack([self.target, np.random.uniform(0.5, 3, size=(1, 1))])
+
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### Set PyBullet's parameters #############################

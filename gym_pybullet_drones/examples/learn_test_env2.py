@@ -60,9 +60,9 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
                 train_env,
                 verbose=1)
        
-    if os.path.isfile(output_folder+'/easy_task2/SAC.pkl'):
+    if os.path.isfile(output_folder+'/easy_task2/sac.pkl'):
         print("CHECKPOINT FILE FOUND")
-        path = output_folder+'/easy_task2/SAC.pkl'
+        path = output_folder+'/easy_task2/sac.pkl'
         model = SAC.load(path, print_system_info=True)
         print("CHECKPOINT LOADED SUCCESFULLY")
     else:   

@@ -53,11 +53,11 @@ class HoverAviary(BaseRLAviary):
 
         """
 
-        targetX, targetY = generate_random_position()
+        # targetX, targetY = generate_random_position()
         # targetY = random.uniform(-1, 1) 
-        self.TARGET_POS = np.array([targetX,targetY,0.25])
+        # self.TARGET_POS = np.array([targetX,targetY,0.25])
         # self.TARGET_POS = np.array([1, targetY, 1])
-        self.EPISODE_LEN_SEC = 7
+        self.EPISODE_LEN_SEC = 20
 
         super().__init__(drone_model=drone_model,
                         num_drones=1,
@@ -71,8 +71,7 @@ class HoverAviary(BaseRLAviary):
                         obs=obs,
                         act=act
                         )
-
-        self.prevDisplacement = np.linalg.norm(self.TARGET_POS - self.INIT_XYZS)
+        self.prevDisplacement = np.linalg.norm(self.target - self.INIT_XYZS)
         self.prevEnergy = 0
         self.prevSpeed = 0 
         self.isArrivedCount = 0 
@@ -86,7 +85,7 @@ class HoverAviary(BaseRLAviary):
         Overrides BaseAviary's method.
 
         """
-        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere.urdf'), self.TARGET_POS,
+        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere.urdf'), self.target.squeeze(),
                                                     p.getQuaternionFromEuler([0,0,0]),
                                                     useFixedBase=True,   # Doesn't move
                                                     #flags = p.URDF_USE_INERTIA_FROM_FILE,
@@ -108,11 +107,11 @@ class HoverAviary(BaseRLAviary):
         ret = 0 
 
         # displacement, energy, overspeed, arrival, accuracy 
-        weights = [2, 0, 1, 5, 1]
+        weights = [1, 1, 1, 0, 0]
 
         # displacement
         currentPosition = state[0:3] 
-        currentDisplacement = np.linalg.norm(self.TARGET_POS - currentPosition)
+        currentDisplacement = np.linalg.norm(self.target - currentPosition)
         displacementDelta = self.prevDisplacement - currentDisplacement 
         self.prevDisplacement = currentDisplacement
 
@@ -142,13 +141,12 @@ class HoverAviary(BaseRLAviary):
 
         if abs(spinningSpeed) > 10:
             ret -= 5
-
         # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
-        if abs(currentPosition[0]) > 0.75 or abs(currentPosition[1]) > 0.75: 
+        if abs(currentPosition[0]) > 3 or abs(currentPosition[1]) > 3: 
             ret -= 100
-        elif currentPosition[2] > 2.2 or currentPosition[2] < 0.05:    
+        elif currentPosition[2] > 5:    
             ret -= 100 
         elif currentDisplacement < 0.05:
         # elif currentDisplacement < 0.12:
@@ -187,7 +185,7 @@ class HoverAviary(BaseRLAviary):
         
 
         currentPosition = state[0:3] 
-        currentDisplacement = np.linalg.norm(self.TARGET_POS - currentPosition)
+        currentDisplacement = np.linalg.norm(self.target - currentPosition)
 
         # if roll > math.pi/2 or roll < -math.pi/2 or pitch > math.pi/2 or pitch < -math.pi/2:
         #     return True 
@@ -196,9 +194,9 @@ class HoverAviary(BaseRLAviary):
             return True
         elif abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             return True 
-        elif abs(x) > 0.75 or abs(y) > 0.75: 
+        elif abs(x) > 3 or abs(y) > 3: 
             return True 
-        elif z > 3 or z < 0.05: 
+        elif z > 5: 
             return True 
         else:
             return False    
@@ -284,7 +282,7 @@ class HoverAviary(BaseRLAviary):
 
         # self.TARGET_POS = np.array([targetX,targetY,1])
         # targetY = random.uniform(-1, 1) 
-        self.TARGET_POS = np.array([targetX,targetY,0.25])
+        # self.TARGET_POS = np.array([targetX,targetY,0.25])
         # self.TARGET_POS = np.array([1, targetY, 1])
         return initial_obs, initial_info
 
