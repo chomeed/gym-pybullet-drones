@@ -10,7 +10,7 @@
         <sphere radius="0.15"/>
       </geometry>
       <material name="Red"> <!-- set color-->
-        <color rgba="1 0 0 0.5"/>
+        <color rgba="1 0 0 1"/>
       </material>
     </visual>
   </link>

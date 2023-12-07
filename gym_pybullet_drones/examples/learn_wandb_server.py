@@ -101,7 +101,8 @@ def run(env_size=DEFAULT_ENV_SIZE, checkpoint_dir=None, steps=DEFAULT_STEPS, mul
 
     #### Save the model ########################################
     model.save(output_folder+'/models/success_model.pkl')
-
+    model.save(output_folder+'/models/success_model')
+    
     #### Print training progression ############################
     # with np.load(filename+'/evaluations.npz') as data:
     #     for j in range(data['timesteps'].shape[0]):

@@ -58,7 +58,7 @@ class HoverAviary(BaseRLAviary):
         # targetY = random.uniform(-1, 1) 
         # self.TARGET_POS = np.array([targetX,targetY,0.25])
         # self.TARGET_POS = np.array([1, targetY, 1])
-        self.EPISODE_LEN_SEC = 20
+        self.EPISODE_LEN_SEC = 50
         self.env_size = env_size
 
         if self.env_size == 'large':
@@ -85,6 +85,12 @@ class HoverAviary(BaseRLAviary):
         self.prevEnergy = 0
         self.prevSpeed = 0 
         self.isArrivedCount = 0 
+        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere.urdf'), self.target.squeeze(),
+                                                    p.getQuaternionFromEuler([0,0,0]),
+                                                    useFixedBase=True,   # Doesn't move
+                                                    #flags = p.URDF_USE_INERTIA_FROM_FILE,
+                                                    physicsClientId=self.CLIENT
+                                                )
 
     ################################################################################
     
@@ -95,12 +101,13 @@ class HoverAviary(BaseRLAviary):
         Overrides BaseAviary's method.
 
         """
-        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere.urdf'), self.target.squeeze(),
-                                                    p.getQuaternionFromEuler([0,0,0]),
-                                                    useFixedBase=True,   # Doesn't move
-                                                    #flags = p.URDF_USE_INERTIA_FROM_FILE,
-                                                    physicsClientId=self.CLIENT
-                                                )
+        pass 
+        # p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere.urdf'), self.target.squeeze(),
+        #                                             p.getQuaternionFromEuler([0,0,0]),
+        #                                             useFixedBase=True,   # Doesn't move
+        #                                             #flags = p.URDF_USE_INERTIA_FROM_FILE,
+        #                                             physicsClientId=self.CLIENT
+        #                                         )
 
         
 
@@ -123,8 +130,6 @@ class HoverAviary(BaseRLAviary):
 
         # displacement
         currentPosition = state[0:3] 
-        # print(self.target, currentPosition)
-
         currentDisplacement = np.linalg.norm(self.target - currentPosition)
         displacementDelta = self.prevDisplacement - currentDisplacement 
         self.prevDisplacement = currentDisplacement
@@ -159,10 +164,6 @@ class HoverAviary(BaseRLAviary):
 
         if abs(spinningSpeed) > 10:
             ret -= 5
-
-
-        ret = -1  
-
         # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
@@ -317,6 +318,13 @@ class HoverAviary(BaseRLAviary):
         elif self.env_size == 'small':
             self.target = np.random.uniform(-0.5, 0.5, size=(1, 2))
             self.target = np.hstack([self.target, np.random.uniform(0.2, 0.8, size=(1, 1))])
+        
+        p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/'+'goal_position_sphere.urdf'), self.target.squeeze(),
+                                                    p.getQuaternionFromEuler([0,0,0]),
+                                                    useFixedBase=True,   # Doesn't move
+                                                    #flags = p.URDF_USE_INERTIA_FROM_FILE,
+                                                    physicsClientId=self.CLIENT
+                                                )
 
         return initial_obs, initial_info
 

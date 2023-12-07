@@ -44,43 +44,25 @@ DEFAULT_MA = False
 
 def run(env_size=DEFAULT_ENV_SIZE, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True):
     print(env_size)
+    train_env = make_vec_env(HoverAviary,
+                                env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT, env_size=env_size),
+                                n_envs=1,
+                                seed=0
+                                )
 
-    test_env_nogui = HoverAviary(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT, env_size=env_size)
+    #### Check the environment's spaces ########################
+    print('[INFO] Action space:', train_env.action_space)
+    print('[INFO] Observation space:', train_env.observation_space)
 
     #### Train the model #######################################
-    model = SAC('MultiInputPolicy',
-                test_env_nogui,
-                verbose=1)
+    # model = SAC('MultiInputPolicy',
+    #             train_env,
+    #             verbose=1)
        
-    # model = None
+    test_env_nogui = HoverAviary(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT, env_size=env_size)
+    import torch
+    model = SAC.load('mymodel.zip', env=test_env_nogui)
 
-    if os.path.isfile(output_folder+'/easy_task2/reduce_obs/v1.pkl'):
-        print("CHECKPOINT FILE FOUND")
-        path = output_folder+'/easy_task2/reduce_obs/v1.pkl'
-        model = SAC.load(path, print_system_info=True)
-        print("CHECKPOINT LOADED SUCCESFULLY")
-    else:   
-        print("[ERROR]: no model under the specified path")
-    
-    #### Show (and record a video of) the model's performance ##
-
-    # test_env = HoverAviary(gui=gui,
-    #                         obs=DEFAULT_OBS,
-    #                         act=DEFAULT_ACT,
-    #                         record=record_video)
-
-
-    # logger = Logger(logging_freq_hz=int(test_env.CTRL_FREQ),
-    #             num_drones=DEFAULT_AGENTS if multiagent else 1,
-    #             output_folder=output_folder,
-    #             colab=colab
-    #             )
-
-    # mean_reward, std_reward = evaluate_policy(model,
-    #                                           test_env_nogui,
-    #                                           n_eval_episodes=10
-    #                                           )
-    # print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
 
     obs, info = test_env_nogui.reset(seed=22, options={})
     start = time.time()
@@ -91,7 +73,9 @@ def run(env_size=DEFAULT_ENV_SIZE, multiagent=DEFAULT_MA, output_folder=DEFAULT_
                                         )
         action = action.squeeze(0)
         obs, reward, terminated, truncated, info = test_env_nogui.step(action)
+        # print(obs['obs_rgb'].shape, obs['obs_rgb'])
         totalReward += reward 
+        # obs2 = obs.squeeze()
         act2 = action.squeeze()
         # print("Obs:", obs, "\tAction", action, "\tReward:", reward, "\tTerminated:", terminated, "\tTruncated:", truncated)
         if DEFAULT_OBS == ObservationType.KIN:
