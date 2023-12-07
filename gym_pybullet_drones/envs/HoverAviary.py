@@ -116,8 +116,8 @@ class HoverAviary(BaseRLAviary):
         spinningSpeed = state[15]
         ret = 0 
 
-        # displacement, energy, overspeed, direction, arrival, accuracy 
-        weights = [2, 0, 0, 0.5, 0, 0]
+        # displacement change, energy, overspeed, direction, displacement, arrival, accuracy 
+        weights = [1, 0, 0, 0.5, 1, 0, 0]
 
         # displacement
         currentPosition = state[0:3] 
@@ -150,7 +150,7 @@ class HoverAviary(BaseRLAviary):
         #     isArrived = 0
 
         # check = [displacementDelta, energyCost, overspeed, direction, int(self.isArrivedCount == 1), isArrived]
-        check = [displacementDelta, energyCost, overspeed, direction, 0, 0]
+        check = [displacementDelta, energyCost, overspeed, direction, -currentDisplacement, 0, 0]
         ret = np.dot(weights, check)
 
         if abs(spinningSpeed) > 10:

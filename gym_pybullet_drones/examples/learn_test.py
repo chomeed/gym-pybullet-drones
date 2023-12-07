@@ -1,6 +1,6 @@
 """Script demonstrating the use of `gym_pybullet_drones`'s Gymnasium interface.
 
-Classes HoverAviary and MultiHoverAviary are used as learning envs for the PPO algorithm.
+Classes HoverAviary and MultiHoverAviary are used as learning envs for the SAC algorithm.
 
 Example
 -------
@@ -22,7 +22,7 @@ import argparse
 import gymnasium as gym
 import numpy as np
 import torch
-from stable_baselines3 import PPO
+from stable_baselines3 import SAC
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import EvalCallback, StopTrainingOnRewardThreshold
 from stable_baselines3.common.evaluation import evaluate_policy
@@ -31,7 +31,7 @@ from gym_pybullet_drones.utils.Logger import Logger
 from gym_pybullet_drones.envs.HoverAviary import HoverAviary
 from gym_pybullet_drones.utils.utils import sync, str2bool
 from gym_pybullet_drones.utils.enums import ObservationType, ActionType
-
+DEFAULT_ENV_SIZE = 'large'
 DEFAULT_GUI = True
 DEFAULT_RECORD_VIDEO = False
 DEFAULT_OUTPUT_FOLDER = 'results/models/rgbkin'
@@ -42,31 +42,30 @@ DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one
 DEFAULT_AGENTS = 1
 DEFAULT_MA = False
 
-def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True):
-  
+def run(env_size=DEFAULT_ENV_SIZE, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True):
+    print(env_size)
     train_env = make_vec_env(HoverAviary,
-                                env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
+                                env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT, env_size=env_size),
                                 n_envs=1,
                                 seed=0
                                 )
-    eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
 
     #### Check the environment's spaces ########################
     print('[INFO] Action space:', train_env.action_space)
     print('[INFO] Observation space:', train_env.observation_space)
 
     #### Train the model #######################################
-    model = PPO('MultiInputPolicy',
+    model = SAC('MultiInputPolicy',
                 train_env,
                 verbose=1)
        
-    if os.path.isfile(output_folder+'/easy_task2/ppo.pkl'):
+    if os.path.isfile(output_folder+'/easy_task2/plz.pkl'):
         print("CHECKPOINT FILE FOUND")
-        path = output_folder+'/easy_task2/ppo.pkl'
-        model = PPO.load(path, print_system_info=True)
+        path = output_folder+'/easy_task2/plz.pkl'
+        model = SAC.load(path, print_system_info=True)
         print("CHECKPOINT LOADED SUCCESFULLY")
     else:   
-        print("[ERROR]: no model under the specified path", filename)
+        print("[ERROR]: no model under the specified path")
     
     #### Show (and record a video of) the model's performance ##
 
@@ -74,7 +73,7 @@ def run(multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_
     #                         obs=DEFAULT_OBS,
     #                         act=DEFAULT_ACT,
     #                         record=record_video)
-    test_env_nogui = HoverAviary(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT)
+    test_env_nogui = HoverAviary(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT, env_size=env_size)
 
 
     # logger = Logger(logging_freq_hz=int(test_env.CTRL_FREQ),
@@ -135,6 +134,7 @@ if __name__ == '__main__':
     parser.add_argument('--record_video',       default=DEFAULT_RECORD_VIDEO,  type=str2bool,      help='Whether to record a video (default: False)', metavar='')
     parser.add_argument('--output_folder',      default=DEFAULT_OUTPUT_FOLDER, type=str,           help='Folder where to save logs (default: "results")', metavar='')
     parser.add_argument('--colab',              default=DEFAULT_COLAB,         type=bool,          help='Whether example is being run by a notebook (default: "False")', metavar='')
+    parser.add_argument('--env_size',           default=DEFAULT_ENV_SIZE,      type=str)
     ARGS = parser.parse_args()
 
     run(**vars(ARGS))
