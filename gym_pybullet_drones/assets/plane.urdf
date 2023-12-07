@@ -12,7 +12,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="plane_small.obj" scale="1 1 1"/> <!-- Adjust the scale values -->
+        <mesh filename="plane.obj" scale="1 1 1"/> <!-- Adjust the scale values -->
       </geometry>
       <material name="white">
         <color rgba="1 1 1 1"/>
@@ -21,7 +21,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 -5"/> <!-- Adjust the z-coordinate accordingly -->
       <geometry>
-        <box size="1.5 1.5 10"/> <!-- Adjust the size values accordingly -->
+        <box size="6 6 10"/> <!-- Adjust the size values accordingly -->
       </geometry>
     </collision>
   </link>

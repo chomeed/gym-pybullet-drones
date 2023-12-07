@@ -26,7 +26,8 @@ class BaseRLAviary(BaseAviary):
                  gui=False,
                  record=False,
                  obs: ObservationType=ObservationType.KIN,
-                 act: ActionType=ActionType.RPM
+                 act: ActionType=ActionType.RPM,
+                 env_size: str ='large'
                  ):
         """Initialization of a generic single and multi-agent RL environment.
 
@@ -91,6 +92,7 @@ class BaseRLAviary(BaseAviary):
                          obstacles=True, # Add obstacles for RGB observations and/or FlyThruGate
                          user_debug_gui=False, # Remove of RPM sliders from all single agent learning aviaries
                          vision_attributes=vision_attributes,
+                         env_size=env_size
                          )
         #### Set a limit on the maximum target speed ###############
         if act == ActionType.VEL:
@@ -367,7 +369,7 @@ class BaseRLAviary(BaseAviary):
             
             rgb_res = np.array([self.rgb[i] for i in range(self.NUM_DRONES)]).astype('uint8')
             # rgb_res = np.expand_dims(rgb_res, axis=3)
-            print(ret)
+            # print(ret)
             return {'obs_rgb': rgb_res,
                     'obs_kin': ret}
 

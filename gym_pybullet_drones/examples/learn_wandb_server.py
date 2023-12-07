@@ -43,6 +43,7 @@ DEFAULT_GUI = True
 DEFAULT_RECORD_VIDEO = False
 DEFAULT_OUTPUT_FOLDER = 'results'
 DEFAULT_COLAB = False
+DEFAULT_ENV_SIZE = 'large'
 
 DEFAULT_OBS = ObservationType('rgbkin') # 'kin' or 'rgb'
 DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one_d_pid'
@@ -51,7 +52,7 @@ DEFAULT_MA = False
 
 DEFAULT_STEPS = 300000
 
-def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True, wb_run=None, **kwargs):
+def run(env_size=DEFAULT_ENV_SIZE, checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_folder=DEFAULT_OUTPUT_FOLDER, gui=DEFAULT_GUI, plot=False, colab=DEFAULT_COLAB, record_video=DEFAULT_RECORD_VIDEO, local=True, wb_run=None, **kwargs):
 
     print("Steps", steps)
     if wb_run == None: 
@@ -62,16 +63,11 @@ def run(checkpoint_dir=None, steps=DEFAULT_STEPS, multiagent=DEFAULT_MA, output_
     if not os.path.exists(filename):
         os.makedirs(filename+'/')
 
-    if not multiagent:
-        train_env = make_vec_env(HoverAviary,
-                                 env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT),
-                                 n_envs=10,
-                                 seed=0
-                                 )
-        eval_env = HoverAviary(obs=DEFAULT_OBS, act=DEFAULT_ACT)
-    else:
-        print("Single Agent Only")
-        return
+    train_env = make_vec_env(HoverAviary,
+                                env_kwargs=dict(obs=DEFAULT_OBS, act=DEFAULT_ACT, env_size=env_size),
+                                n_envs=10,
+                                seed=0
+                                )
 
     #### Check the environment's spaces ########################
     print('[INFO] Action space:', train_env.action_space)
@@ -157,8 +153,9 @@ if __name__ == '__main__':
     parser.add_argument('--output_folder',      default=DEFAULT_OUTPUT_FOLDER, type=str,           help='Folder where to save logs (default: "results")', metavar='')
     parser.add_argument('--colab',              default=DEFAULT_COLAB,         type=bool,          help='Whether example is being run by a notebook (default: "False")', metavar='')
     parser.add_argument('--wandb_key')
-    parser.add_argument('--checkpoint_dir',      default=None)
+    parser.add_argument('--checkpoint_dir',     default=None)
     parser.add_argument('--steps',              default=DEFAULT_STEPS)
+    parser.add_argument('--env_size',           default=DEFAULT_ENV_SIZE,      type=str)
     ARGS = parser.parse_args()
 
     wandb.login(key=ARGS.wandb_key)

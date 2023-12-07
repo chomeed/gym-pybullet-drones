@@ -32,11 +32,11 @@ DEFAULT_OBS = ObservationType('rgbkin') # 'kin' or 'rgb'
 DEFAULT_ACT = ActionType('rpm') # 'rpm' or 'pid' or 'vel' or 'one_d_rpm' or 'one_d_pid'
 DEFAULT_AGENTS = 1
 
-def run(gui=DEFAULT_GUI, plot=False, ):
+def run(gui=DEFAULT_GUI, plot=False, env_size='large'):
   
  
   
-    test_env = HoverAviary(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT)
+    test_env = HoverAviary(gui=gui, obs=DEFAULT_OBS, act=DEFAULT_ACT, env_size=env_size)
     print('[INFO] Action space:', test_env.action_space)
     print('[INFO] Observation space:', test_env.observation_space)
 
@@ -68,6 +68,8 @@ if __name__ == '__main__':
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Single agent reinforcement learning example script')
     parser.add_argument('--gui',                default=DEFAULT_GUI,           type=str2bool,      help='Whether to use PyBullet GUI (default: True)', metavar='')
+    parser.add_argument('--env_size',           default='large',      type=str)
+    
     ARGS = parser.parse_args()
 
     run(**vars(ARGS))

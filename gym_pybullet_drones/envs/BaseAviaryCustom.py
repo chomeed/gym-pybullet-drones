@@ -36,7 +36,8 @@ class BaseAviary(gym.Env):
                  obstacles=False,
                  user_debug_gui=False,
                  vision_attributes=True,
-                 output_folder='results'
+                 output_folder='results',
+                 env_size: str='large'
                  ):
         """Initialization of a generic aviary environment.
 
@@ -148,7 +149,7 @@ class BaseAviary(gym.Env):
         if self.GUI:
             #### With debug GUI ########################################
             self.CLIENT = p.connect(p.GUI) # p.connect(p.GUI, options="--opengl2")
-            # p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0, physicsClientId=self.CLIENT)
+            p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0, physicsClientId=self.CLIENT)
             for i in [p.COV_ENABLE_RGB_BUFFER_PREVIEW, p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW]:
                 p.configureDebugVisualizer(i, 1, physicsClientId=self.CLIENT)
             # p.configureDebugVisualizer(p.COV_ENABLE_RGB_BUFFER_PREVIEW, 1, physicsClientId=self.CLIENT)
@@ -487,9 +488,6 @@ class BaseAviary(gym.Env):
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
 
-        self.target = np.random.uniform(-2.5, 2.5, size=(1, 2))
-        self.target = np.hstack([self.target, np.random.uniform(0.5, 3, size=(1, 1))])
-
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### Set PyBullet's parameters #############################
@@ -498,7 +496,12 @@ class BaseAviary(gym.Env):
         p.setTimeStep(self.PYB_TIMESTEP, physicsClientId=self.CLIENT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath(), physicsClientId=self.CLIENT)
         #### Load ground plane, drone and obstacles models #########
-        self.PLANE_ID = p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/plane_small.urdf'), physicsClientId=self.CLIENT)
+
+        if self.env_size == 'large':
+            self.PLANE_ID = p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/plane.urdf'), physicsClientId=self.CLIENT)
+        elif self.env_size == 'small':
+            self.PLANE_ID = p.loadURDF(pkg_resources.resource_filename('gym_pybullet_drones', 'assets/plane_small.urdf'), physicsClientId=self.CLIENT)
+            
 
         ##
         import random

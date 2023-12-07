@@ -22,7 +22,8 @@ class HoverAviary(BaseRLAviary):
                  gui=False,
                  record=False,
                  obs: ObservationType=ObservationType.KIN,
-                 act: ActionType=ActionType.RPM
+                 act: ActionType=ActionType.RPM,
+                 env_size: str = 'large'
                  ):
         """Initialization of a single agent RL environment.
 
@@ -58,6 +59,14 @@ class HoverAviary(BaseRLAviary):
         # self.TARGET_POS = np.array([targetX,targetY,0.25])
         # self.TARGET_POS = np.array([1, targetY, 1])
         self.EPISODE_LEN_SEC = 20
+        self.env_size = env_size
+
+        if self.env_size == 'large':
+            self.target = np.random.uniform(-1, 1, size=(1, 2))
+            self.target = np.hstack([self.target, np.random.uniform(0.5, 2, size=(1, 1))])
+        elif self.env_size == 'small':
+            self.target = np.random.uniform(-0.5, 0.5, size=(1, 2))
+            self.target = np.hstack([self.target, np.random.uniform(0.2, 0.8, size=(1, 1))])
 
         super().__init__(drone_model=drone_model,
                         num_drones=1,
@@ -69,7 +78,8 @@ class HoverAviary(BaseRLAviary):
                         gui=gui,
                         record=record,
                         obs=obs,
-                        act=act
+                        act=act,
+                        env_size=env_size,
                         )
         self.prevDisplacement = np.linalg.norm(self.target - self.INIT_XYZS)
         self.prevEnergy = 0
@@ -144,14 +154,16 @@ class HoverAviary(BaseRLAviary):
         # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
-        if abs(currentPosition[0]) > 3 or abs(currentPosition[1]) > 3: 
-            ret -= 100
         elif currentPosition[2] > 5:    
             ret -= 100 
         elif currentDisplacement < 0.05:
         # elif currentDisplacement < 0.12:
             ret += 100
         elif self.step_counter/self.PYB_FREQ > self.EPISODE_LEN_SEC:
+            ret -= 100
+        elif self.env_size == 'large' and (abs(currentPosition[0]) > 1.25 or abs(currentPosition[1]) > 1.25): 
+            ret -= 100
+        elif self.env_size == 'small' and (abs(currentPosition[0]) > 0.75 or abs(currentPosition[1]) > 0.75):
             ret -= 100
 
         
@@ -194,8 +206,10 @@ class HoverAviary(BaseRLAviary):
             return True
         elif abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             return True 
-        elif abs(x) > 3 or abs(y) > 3: 
-            return True 
+        elif self.env_size == 'large' and (abs(x) > 1.25 or abs(y) > 1.25): 
+            return True
+        elif self.env_size == 'small' and (abs(x) > 0.75 or abs(y) > 0.75):
+            return True
         elif z > 5: 
             return True 
         else:
@@ -284,6 +298,14 @@ class HoverAviary(BaseRLAviary):
         # targetY = random.uniform(-1, 1) 
         # self.TARGET_POS = np.array([targetX,targetY,0.25])
         # self.TARGET_POS = np.array([1, targetY, 1])
+
+        if self.env_size == 'large':
+            self.target = np.random.uniform(-1, 1, size=(1, 2))
+            self.target = np.hstack([self.target, np.random.uniform(0.5, 2, size=(1, 1))])
+        elif self.env_size == 'small':
+            self.target = np.random.uniform(-0.5, 0.5, size=(1, 2))
+            self.target = np.hstack([self.target, np.random.uniform(0.2, 0.8, size=(1, 1))])
+
         return initial_obs, initial_info
 
 def generate_random_position():
