@@ -205,7 +205,7 @@ class BaseAviary(gym.Env):
         if initial_xyzs is None:
             self.INIT_XYZS = np.vstack([np.array([x*4*self.L for x in range(self.NUM_DRONES)]), \
                                         np.array([y*4*self.L for y in range(self.NUM_DRONES)]), \
-                                        np.ones(self.NUM_DRONES)*0.25]).transpose().reshape(self.NUM_DRONES, 3)
+                                        np.ones(self.NUM_DRONES)*0.5]).transpose().reshape(self.NUM_DRONES, 3)
                                         # np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)]).transpose().reshape(self.NUM_DRONES, 3)
         elif np.array(initial_xyzs).shape == (self.NUM_DRONES,3):
             self.INIT_XYZS = initial_xyzs
@@ -531,12 +531,12 @@ class BaseAviary(gym.Env):
                                               ) for i in range(self.NUM_DRONES)])
 
         randomTorque = random.uniform(-0.02, 0.02)
-        p.applyExternalTorque(self.DRONE_IDS[0],
-                              4,
-                              torqueObj=[0, 0, randomTorque],
-                              flags=p.LINK_FRAME,
-                              physicsClientId=self.CLIENT
-                              )
+        # p.applyExternalTorque(self.DRONE_IDS[0],
+        #                       4,
+        #                       torqueObj=[0, 0, randomTorque],
+        #                       flags=p.LINK_FRAME,
+        #                       physicsClientId=self.CLIENT
+        #                       )
 
         # p.applyExternalForce(self.DRONE_IDS[0],
         #                          4,
