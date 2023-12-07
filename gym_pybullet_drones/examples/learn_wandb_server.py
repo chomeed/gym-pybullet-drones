@@ -97,7 +97,7 @@ def run(env_size=DEFAULT_ENV_SIZE, checkpoint_dir=None, steps=DEFAULT_STEPS, mul
                     model_save_path=output_folder + f"/models/{wb_run.id}",
                     verbose=2
                 ),
-                log_interval=25)
+                log_interval=20)
 
     #### Save the model ########################################
     model.save(output_folder+'/models/success_model.pkl')

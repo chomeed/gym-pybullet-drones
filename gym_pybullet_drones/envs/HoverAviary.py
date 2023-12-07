@@ -159,6 +159,10 @@ class HoverAviary(BaseRLAviary):
 
         if abs(spinningSpeed) > 10:
             ret -= 5
+
+
+        ret = -1  
+
         # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
