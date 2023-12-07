@@ -59,9 +59,9 @@ def run(env_size=DEFAULT_ENV_SIZE, multiagent=DEFAULT_MA, output_folder=DEFAULT_
                 train_env,
                 verbose=1)
        
-    if os.path.isfile(output_folder+'/easy_task2/plz.pkl'):
+    if os.path.isfile(output_folder+'/easy_task2/v3.pkl'):
         print("CHECKPOINT FILE FOUND")
-        path = output_folder+'/easy_task2/plz.pkl'
+        path = output_folder+'/easy_task2/v3.pkl'
         model = SAC.load(path, print_system_info=True)
         print("CHECKPOINT LOADED SUCCESFULLY")
     else:   
@@ -115,10 +115,13 @@ def run(env_size=DEFAULT_ENV_SIZE, multiagent=DEFAULT_MA, output_folder=DEFAULT_
                 #     control=np.zeros(12)
                 #     )
         # test_env.render() 
+        print(totalReward)
         # print(terminated)
         sync(i, start, test_env_nogui.CTRL_TIMESTEP)
         if terminated or truncated:
+            print('-'*99)
             print(totalReward)
+            print('-'*99)
             totalReward = 0
             obs, info = test_env_nogui.reset(seed=22, options={})
     test_env_nogui.close()

@@ -54,12 +54,14 @@ def run(gui=DEFAULT_GUI, plot=False, env_size='large'):
         action = action.squeeze(0)
         obs, reward, terminated, truncated, info = test_env.step(action)
         totalReward += reward 
+        print(totalReward)
         act2 = action.squeeze()
 
         sync(i, start, test_env.CTRL_TIMESTEP)
         
         if terminated or truncated:
             print(totalReward)
+            print('-'*99)
             totalReward = 0
             obs, info = test_env.reset(seed=22, options={})
     test_env.close()

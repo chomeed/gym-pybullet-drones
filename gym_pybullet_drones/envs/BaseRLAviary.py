@@ -65,7 +65,7 @@ class BaseRLAviary(BaseAviary):
 
         """
         #### Create a buffer for the last 10 actions ###############
-        self.ACTION_BUFFER_SIZE = 10
+        self.ACTION_BUFFER_SIZE = 1
         self.action_buffer = deque(maxlen=self.ACTION_BUFFER_SIZE)
         ####
         # vision_attributes = True if obs == ObservationType.RGB else False
@@ -188,7 +188,7 @@ class BaseRLAviary(BaseAviary):
             commanded to the 4 motors of each drone.
 
         """
-
+        self.action_buffer.append(action)
         rpm = np.zeros((self.NUM_DRONES,4))
         for k in range(action.shape[0]):
             target = action[k, :]
@@ -288,7 +288,7 @@ class BaseRLAviary(BaseAviary):
             #OBS SPACE OF SIZE 12(w/o quat) + 3 target + past 10x4 rpms => 55
             obs_rgb = spaces.Box(low=0,
                               high=255,
-                              shape=(self.IMG_RES[1], self.IMG_RES[0], 4), dtype=np.uint8)
+                              shape=(self.IMG_RES[1], self.IMG_RES[0], 1), dtype=np.uint8)
 
             lo = -np.inf
             hi = np.inf
@@ -366,10 +366,8 @@ class BaseRLAviary(BaseAviary):
                     ret = np.hstack([ret, np.array([self.action_buffer[i][j, :] for j in range(self.NUM_DRONES)])])
                 except: 
                     print("error occured!")
-            
-            rgb_res = np.array([self.rgb[i] for i in range(self.NUM_DRONES)]).astype('uint8')
-            # rgb_res = np.expand_dims(rgb_res, axis=3)
-            # print(ret)
+            rgb_res = np.array([self.dep[i] for i in range(self.NUM_DRONES)]).astype('uint8')
+            rgb_res = np.expand_dims(rgb_res, axis=3)
             return {'obs_rgb': rgb_res,
                     'obs_kin': ret}
 

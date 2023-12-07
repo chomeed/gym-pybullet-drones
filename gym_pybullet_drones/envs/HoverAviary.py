@@ -102,6 +102,8 @@ class HoverAviary(BaseRLAviary):
                                                     physicsClientId=self.CLIENT
                                                 )
 
+        
+
     def _computeReward(self):
         """Computes the current reward value.
 
@@ -121,6 +123,8 @@ class HoverAviary(BaseRLAviary):
 
         # displacement
         currentPosition = state[0:3] 
+        # print(self.target, currentPosition)
+
         currentDisplacement = np.linalg.norm(self.target - currentPosition)
         displacementDelta = self.prevDisplacement - currentDisplacement 
         self.prevDisplacement = currentDisplacement
