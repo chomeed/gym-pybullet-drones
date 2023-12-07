@@ -510,8 +510,8 @@ class BaseAviary(gym.Env):
         def generate_random_rpy(max_roll_pitch=10):
             rolls = [random.uniform(-max_roll_pitch, max_roll_pitch) for _ in range(self.NUM_DRONES)]
             pitches = [random.uniform(-max_roll_pitch, max_roll_pitch) for _ in range(self.NUM_DRONES)]
-            # yaws = [random.uniform(-np.pi, np.pi) for _ in range(self.NUM_DRONES)]
-            yaws = [0 for _ in range(self.NUM_DRONES)]
+            yaws = [random.uniform(-np.pi, np.pi) for _ in range(self.NUM_DRONES)]
+            # yaws = [0 for _ in range(self.NUM_DRONES)]
 
             # Convert angles to radians
             rolls_rad = np.radians(rolls)

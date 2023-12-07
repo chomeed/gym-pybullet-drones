@@ -155,7 +155,7 @@ if __name__ == '__main__':
     parser.add_argument('--wandb_key')
     parser.add_argument('--checkpoint_dir',     default=None)
     parser.add_argument('--steps',              default=DEFAULT_STEPS)
-    parser.add_argument('--env_size',           default=DEFAULT_ENV_SIZE,      type=str)
+    parser.add_argument('--env_size',             default=DEFAULT_ENV_SIZE,      type=str)
     ARGS = parser.parse_args()
 
     wandb.login(key=ARGS.wandb_key)
