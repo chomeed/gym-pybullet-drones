@@ -34,7 +34,7 @@ from gym_pybullet_drones.utils.enums import ObservationType, ActionType
 DEFAULT_ENV_SIZE = 'large'
 DEFAULT_GUI = True
 DEFAULT_RECORD_VIDEO = False
-DEFAULT_OUTPUT_FOLDER = 'results/models/rgbkin'
+DEFAULT_OUTPUT_FOLDER = 'our_model'
 DEFAULT_COLAB = False
 
 DEFAULT_OBS = ObservationType('rgbkin') # 'kin' or 'rgb'
@@ -51,36 +51,16 @@ def run(env_size=DEFAULT_ENV_SIZE, multiagent=DEFAULT_MA, output_folder=DEFAULT_
     model = SAC('MultiInputPolicy',
                 test_env_nogui,
                 verbose=1)
-       
-    # model = None
 
-    if os.path.isfile(output_folder+'/easy_task2/reduce_obs/best_integ.pkl'):
+    if os.path.isfile(output_folder+'/93.pkl'): # or use '/92.pkl'
         print("CHECKPOINT FILE FOUND")
-        path = output_folder+'/easy_task2/reduce_obs/best_integ.pkl'
+        path = output_folder+'/93.pkl'
         model = SAC.load(path, print_system_info=True)
         print("CHECKPOINT LOADED SUCCESFULLY")
     else:   
         print("[ERROR]: no model under the specified path")
     
     #### Show (and record a video of) the model's performance ##
-
-    # test_env = HoverAviary(gui=gui,
-    #                         obs=DEFAULT_OBS,
-    #                         act=DEFAULT_ACT,
-    #                         record=record_video)
-
-
-    # logger = Logger(logging_freq_hz=int(test_env.CTRL_FREQ),
-    #             num_drones=DEFAULT_AGENTS if multiagent else 1,
-    #             output_folder=output_folder,
-    #             colab=colab
-    #             )
-
-    # mean_reward, std_reward = evaluate_policy(model,
-    #                                           test_env_nogui,
-    #                                           n_eval_episodes=10
-    #                                           )
-    # print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
 
     obs, info = test_env_nogui.reset(seed=22, options={})
     start = time.time()
@@ -93,22 +73,7 @@ def run(env_size=DEFAULT_ENV_SIZE, multiagent=DEFAULT_MA, output_folder=DEFAULT_
         obs, reward, terminated, truncated, info = test_env_nogui.step(action)
         totalReward += reward 
         act2 = action.squeeze()
-        # print("Obs:", obs, "\tAction", action, "\tReward:", reward, "\tTerminated:", terminated, "\tTruncated:", truncated)
-        if DEFAULT_OBS == ObservationType.KIN:
-            if not multiagent:
-                pass
-                # logger.log(drone=0,
-                #     timestamp=i/test_env.CTRL_FREQ,
-                #     state=np.hstack([obs2[0:3],
-                #                         np.zeros(4),
-                #                         obs2[3:15],
-                #                         act2
-                #                         ]),
-                #     control=np.zeros(12)
-                #     )
-        # test_env.render() 
-        # print(totalReward)
-        # print(terminated)
+
         sync(i, start, test_env_nogui.CTRL_TIMESTEP)
         if terminated or truncated:
             print('-'*99)
