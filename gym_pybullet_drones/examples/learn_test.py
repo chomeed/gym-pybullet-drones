@@ -54,9 +54,9 @@ def run(env_size=DEFAULT_ENV_SIZE, multiagent=DEFAULT_MA, output_folder=DEFAULT_
        
     # model = None
 
-    if os.path.isfile(output_folder+'/easy_task2/reduce_obs/v1.pkl'):
+    if os.path.isfile(output_folder+'/easy_task2/reduce_obs/best_integ.pkl'):
         print("CHECKPOINT FILE FOUND")
-        path = output_folder+'/easy_task2/reduce_obs/v1.pkl'
+        path = output_folder+'/easy_task2/reduce_obs/best_integ.pkl'
         model = SAC.load(path, print_system_info=True)
         print("CHECKPOINT LOADED SUCCESFULLY")
     else:   

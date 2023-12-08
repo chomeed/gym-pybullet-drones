@@ -47,7 +47,7 @@ def run(gui=DEFAULT_GUI, plot=False, env_size='large'):
     obs, info = test_env.reset(seed=22, options={})
     start = time.time()
     totalReward = 0
-    for i in range((test_env.EPISODE_LEN_SEC+50)*test_env.CTRL_FREQ):
+    for i in range((test_env.EPISODE_LEN_SEC+500)*test_env.CTRL_FREQ):
         action, _states = model.predict(obs,
                                         deterministic=True
                                         )

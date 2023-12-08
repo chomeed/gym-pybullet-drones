@@ -72,7 +72,7 @@ def run(env_size=DEFAULT_ENV_SIZE, checkpoint_dir=None, steps=DEFAULT_STEPS, mul
     #### Check the environment's spaces ########################
     print('[INFO] Action space:', train_env.action_space)
     print('[INFO] Observation space:', train_env.observation_space)
-
+    
     #### Train the model #######################################
     model = SAC('MultiInputPolicy',
                 train_env,

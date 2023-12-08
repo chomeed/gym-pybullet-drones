@@ -58,7 +58,7 @@ class HoverAviary(BaseRLAviary):
         # targetY = random.uniform(-1, 1) 
         # self.TARGET_POS = np.array([targetX,targetY,0.25])
         # self.TARGET_POS = np.array([1, targetY, 1])
-        self.EPISODE_LEN_SEC = 50
+        self.EPISODE_LEN_SEC = 10
         self.env_size = env_size
 
         if self.env_size == 'large':
@@ -164,6 +164,8 @@ class HoverAviary(BaseRLAviary):
 
         if abs(spinningSpeed) > 10:
             ret -= 5
+        # ret = -1
+
         # termination condition
         if abs(roll) > 2.967 or abs(pitch) > 2.967: # 170도 이상 회전하면 terminate
             ret -= 100
